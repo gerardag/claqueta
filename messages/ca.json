@@ -9,6 +9,25 @@
     "import": "Importar",
     "settings": "Configuració"
   },
+  "auth": {
+    "loginTitle": "Inicia sessió",
+    "registerTitle": "Crea un compte",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "name": "Nom",
+    "login": "Entra",
+    "register": "Registra't",
+    "loading": "Carregant…",
+    "signOut": "Tanca la sessió",
+    "noAccount": "No tens compte?",
+    "registerLink": "Registra't",
+    "hasAccount": "Ja tens compte?",
+    "loginLink": "Inicia sessió",
+    "invalidCredentials": "Credencials incorrectes",
+    "emailTaken": "Ja existeix un compte amb aquest correu",
+    "validationError": "Revisa les dades del formulari",
+    "registrationDisabled": "El registre està desactivat"
+  },
   "pages": {
     "series": {
       "title": "Les meves sèries",

@@ -8,7 +8,7 @@ import {
   SettingsIcon,
 } from "./icons";
 
-export function Sidebar() {
+export function Sidebar({ userMenu }: { userMenu?: React.ReactNode }) {
   const t = useTranslations("nav");
 
   return (
@@ -35,6 +35,7 @@ export function Sidebar() {
           {t("settings")}
         </NavLink>
       </nav>
+      {userMenu && <div className="hidden md:block">{userMenu}</div>}
     </aside>
   );
 }
