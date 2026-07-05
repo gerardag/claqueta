@@ -1,0 +1,31 @@
+{
+  "app": {
+    "title": "Claqueta 🎬"
+  },
+  "nav": {
+    "series": "Les meves sèries",
+    "calendar": "Calendari",
+    "search": "Cerca",
+    "import": "Importar",
+    "settings": "Configuració"
+  },
+  "pages": {
+    "series": {
+      "title": "Les meves sèries",
+      "empty": "Encara no segueixes cap sèrie."
+    },
+    "calendar": {
+      "title": "Calendari"
+    },
+    "search": {
+      "title": "Cerca",
+      "placeholder": "Cerca sèries..."
+    },
+    "import": {
+      "title": "Importar"
+    },
+    "settings": {
+      "title": "Configuració"
+    }
+  }
+}
