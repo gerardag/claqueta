@@ -50,7 +50,10 @@
       }
     },
     "calendar": {
-      "title": "Calendari"
+      "title": "Calendari",
+      "upcoming": "Properament",
+      "today": "Avui",
+      "empty": "No hi ha episodis aquest mes."
     },
     "search": {
       "title": "Cerca",

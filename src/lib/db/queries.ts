@@ -1,4 +1,4 @@
-import { eq, and, sql, asc, gt } from "drizzle-orm";
+import { eq, and, sql, asc, gt, gte, lte, inArray } from "drizzle-orm";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import * as schema from "./schema";
 
@@ -221,6 +221,60 @@ export function getUpcoming(
     .where(gt(schema.episodes.airDate, today))
     .orderBy(asc(schema.episodes.airDate))
     .all();
+}
+
+export interface CalendarEpisode {
+  episodeId: number;
+  showId: number;
+  showName: string;
+  posterPath: string | null;
+  seasonNumber: number;
+  episodeNumber: number;
+  name: string | null;
+  airDate: string;
+  watched: boolean;
+}
+
+export function getCalendar(
+  db: DB,
+  userId: number,
+  from: string,
+  to: string,
+): CalendarEpisode[] {
+  return db
+    .select({
+      episodeId: schema.episodes.id,
+      showId: schema.shows.id,
+      showName: schema.shows.name,
+      posterPath: schema.shows.posterPath,
+      seasonNumber: schema.episodes.seasonNumber,
+      episodeNumber: schema.episodes.episodeNumber,
+      name: schema.episodes.name,
+      airDate: schema.episodes.airDate,
+      watched: sql<boolean>`exists(
+        select 1 from ${schema.watchedEpisodes}
+        where ${schema.watchedEpisodes.userId} = ${userId}
+          and ${schema.watchedEpisodes.episodeId} = ${schema.episodes.id}
+      )`,
+    })
+    .from(schema.episodes)
+    .innerJoin(schema.shows, eq(schema.episodes.showId, schema.shows.id))
+    .innerJoin(
+      schema.userShows,
+      and(
+        eq(schema.userShows.showId, schema.shows.id),
+        eq(schema.userShows.userId, userId),
+      ),
+    )
+    .where(
+      and(
+        inArray(schema.userShows.state, ["WATCHING", "FOLLOWING"]),
+        gte(schema.episodes.airDate, from),
+        lte(schema.episodes.airDate, to),
+      ),
+    )
+    .orderBy(asc(schema.episodes.airDate), asc(schema.shows.name))
+    .all() as CalendarEpisode[];
 }
 
 export function upsertShow(db: DB, show: schema.NewShow): schema.Show {
