@@ -31,7 +31,23 @@
   "pages": {
     "series": {
       "title": "Les meves sèries",
-      "empty": "Encara no segueixes cap sèrie."
+      "empty": "Encara no segueixes cap sèrie.",
+      "searchCta": "Cerca sèries",
+      "pending": "{count, plural, one {Tens # episodi pendent} other {Tens # episodis pendents}}",
+      "nextEpisode": "Nou episodi el {date}",
+      "lastWatched": "Últim episodi vist {time}",
+      "sections": {
+        "watching": "Estàs mirant",
+        "following": "En seguiment",
+        "stale": "Fa temps que no les mires",
+        "completed": "Completades",
+        "stopped": "Abandonades"
+      },
+      "actions": {
+        "continue": "Continua",
+        "stop": "Deixa de mirar",
+        "delete": "Elimina"
+      }
     },
     "calendar": {
       "title": "Calendari"
