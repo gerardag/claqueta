@@ -6,6 +6,14 @@ type DB = BetterSQLite3Database<typeof schema>;
 
 const STALE_DAYS = Number(process.env.STALE_DAYS ?? "45");
 
+export interface NextEpisodeInfo {
+  seasonNumber: number;
+  episodeNumber: number;
+  name: string | null;
+  airDate: string | null;
+  pendingAfter: number;
+}
+
 export interface ShowWithProgress {
   userShowId: number;
   showId: number;
@@ -18,6 +26,8 @@ export interface ShowWithProgress {
   watched: number;
   totalAired: number;
   totalEpisodes: number;
+  nextEpisode: NextEpisodeInfo | null;
+  latestUnwatchedAirDate: string | null;
 }
 
 export function getUserShowsGrouped(db: DB, userId: number) {
@@ -25,6 +35,8 @@ export function getUserShowsGrouped(db: DB, userId: number) {
   const staleThreshold = new Date(
     now.getTime() - STALE_DAYS * 24 * 60 * 60 * 1000,
   );
+
+  const today = now.toISOString().slice(0, 10);
 
   const rows = db
     .select({
@@ -46,8 +58,63 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       totalAired: sql<number>`coalesce((
         select count(*) from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
-          and ${schema.episodes.airDate} <= ${now.toISOString().slice(0, 10)}
+          and ${schema.episodes.airDate} <= ${today}
       ), 0)`,
+      nextEpSeason: sql<number | null>`(
+        select ${schema.episodes.seasonNumber} from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+          and ${schema.episodes.id} not in (
+            select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
+            where ${schema.watchedEpisodes.userId} = ${userId}
+          )
+        order by ${schema.episodes.seasonNumber} asc, ${schema.episodes.episodeNumber} asc
+        limit 1
+      )`,
+      nextEpNumber: sql<number | null>`(
+        select ${schema.episodes.episodeNumber} from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+          and ${schema.episodes.id} not in (
+            select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
+            where ${schema.watchedEpisodes.userId} = ${userId}
+          )
+        order by ${schema.episodes.seasonNumber} asc, ${schema.episodes.episodeNumber} asc
+        limit 1
+      )`,
+      nextEpName: sql<string | null>`(
+        select ${schema.episodes.name} from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+          and ${schema.episodes.id} not in (
+            select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
+            where ${schema.watchedEpisodes.userId} = ${userId}
+          )
+        order by ${schema.episodes.seasonNumber} asc, ${schema.episodes.episodeNumber} asc
+        limit 1
+      )`,
+      nextEpAirDate: sql<string | null>`(
+        select ${schema.episodes.airDate} from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+          and ${schema.episodes.id} not in (
+            select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
+            where ${schema.watchedEpisodes.userId} = ${userId}
+          )
+        order by ${schema.episodes.seasonNumber} asc, ${schema.episodes.episodeNumber} asc
+        limit 1
+      )`,
+      latestUnwatchedAirDate: sql<string | null>`(
+        select ${schema.episodes.airDate} from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+          and ${schema.episodes.id} not in (
+            select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
+            where ${schema.watchedEpisodes.userId} = ${userId}
+          )
+        order by ${schema.episodes.seasonNumber} desc, ${schema.episodes.episodeNumber} desc
+        limit 1
+      )`,
     })
     .from(schema.userShows)
     .innerJoin(schema.shows, eq(schema.userShows.showId, schema.shows.id))
@@ -55,12 +122,25 @@ export function getUserShowsGrouped(db: DB, userId: number) {
     .all();
 
   const watching: ShowWithProgress[] = [];
+  const watchlist: ShowWithProgress[] = [];
   const stale: ShowWithProgress[] = [];
   const following: ShowWithProgress[] = [];
   const completed: ShowWithProgress[] = [];
   const stopped: ShowWithProgress[] = [];
 
   for (const row of rows) {
+    const pending = row.totalAired - row.watched;
+    const nextEpisode: NextEpisodeInfo | null =
+      row.nextEpSeason != null && row.nextEpNumber != null
+        ? {
+            seasonNumber: row.nextEpSeason,
+            episodeNumber: row.nextEpNumber,
+            name: row.nextEpName,
+            airDate: row.nextEpAirDate,
+            pendingAfter: Math.max(0, pending - 1),
+          }
+        : null;
+
     const item: ShowWithProgress = {
       userShowId: row.userShowId,
       showId: row.showId,
@@ -73,18 +153,38 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       watched: row.watched,
       totalAired: row.totalAired,
       totalEpisodes: row.totalEpisodes,
+      nextEpisode,
+      latestUnwatchedAirDate: row.latestUnwatchedAirDate,
     };
+
+    const pendingEpisodesAreOld =
+      row.nextEpAirDate != null &&
+      new Date(row.nextEpAirDate + "T00:00:00") < staleThreshold;
 
     switch (row.state) {
       case "WATCHING":
-        if (row.lastActivityAt > staleThreshold) {
-          watching.push(item);
-        } else {
+        if (row.watched === 0) {
+          watchlist.push(item);
+        } else if (
+          row.lastActivityAt <= staleThreshold ||
+          pendingEpisodesAreOld
+        ) {
           stale.push(item);
+        } else if (pending === 0 && !row.nextAirDate) {
+          following.push(item);
+        } else {
+          watching.push(item);
         }
         break;
       case "FOLLOWING":
-        following.push(item);
+        if (
+          row.lastActivityAt <= staleThreshold ||
+          pendingEpisodesAreOld
+        ) {
+          stale.push(item);
+        } else {
+          following.push(item);
+        }
         break;
       case "COMPLETED":
         completed.push(item);
@@ -95,9 +195,13 @@ export function getUserShowsGrouped(db: DB, userId: number) {
     }
   }
 
-  watching.sort(
-    (a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime(),
-  );
+  watching.sort((a, b) => {
+    const aDate = a.latestUnwatchedAirDate ?? "";
+    const bDate = b.latestUnwatchedAirDate ?? "";
+    if (aDate !== bDate) return bDate.localeCompare(aDate);
+    return b.lastActivityAt.getTime() - a.lastActivityAt.getTime();
+  });
+  watchlist.sort((a, b) => a.name.localeCompare(b.name));
   stale.sort(
     (a, b) => a.lastActivityAt.getTime() - b.lastActivityAt.getTime(),
   );
@@ -113,7 +217,46 @@ export function getUserShowsGrouped(db: DB, userId: number) {
     (a, b) => b.lastActivityAt.getTime() - a.lastActivityAt.getTime(),
   );
 
-  return { watching, stale, following, completed, stopped };
+  return { watching, watchlist, stale, following, completed, stopped };
+}
+
+export interface LibraryShow {
+  userShowId: number;
+  tmdbId: number;
+  name: string;
+  posterPath: string | null;
+  state: schema.UserShow["state"];
+  watched: number;
+  totalAired: number;
+}
+
+export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return db
+    .select({
+      userShowId: schema.userShows.id,
+      tmdbId: schema.shows.tmdbId,
+      name: schema.shows.name,
+      posterPath: schema.shows.posterPath,
+      state: schema.userShows.state,
+      watched: sql<number>`coalesce((
+        select count(*) from ${schema.watchedEpisodes}
+        inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
+        where ${schema.watchedEpisodes.userId} = ${userId}
+          and ${schema.episodes.showId} = ${schema.shows.id}
+      ), 0)`,
+      totalAired: sql<number>`coalesce((
+        select count(*) from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.airDate} <= ${today}
+      ), 0)`,
+    })
+    .from(schema.userShows)
+    .innerJoin(schema.shows, eq(schema.userShows.showId, schema.shows.id))
+    .where(eq(schema.userShows.userId, userId))
+    .orderBy(asc(schema.shows.name))
+    .all();
 }
 
 export function getUserShows(
@@ -336,6 +479,110 @@ export function updateUserShowState(
       and(
         eq(schema.userShows.userId, userId),
         eq(schema.userShows.showId, showId),
+      ),
+    )
+    .run();
+}
+
+export function getUserShowByTmdbId(
+  db: DB,
+  userId: number,
+  tmdbId: number,
+): (schema.UserShow & { showId: number }) | undefined {
+  return db
+    .select({
+      id: schema.userShows.id,
+      userId: schema.userShows.userId,
+      showId: schema.userShows.showId,
+      state: schema.userShows.state,
+      lastActivityAt: schema.userShows.lastActivityAt,
+      createdAt: schema.userShows.createdAt,
+    })
+    .from(schema.userShows)
+    .innerJoin(schema.shows, eq(schema.userShows.showId, schema.shows.id))
+    .where(
+      and(
+        eq(schema.userShows.userId, userId),
+        eq(schema.shows.tmdbId, tmdbId),
+      ),
+    )
+    .get() as (schema.UserShow & { showId: number }) | undefined;
+}
+
+export function getWatchedEpisodeIds(
+  db: DB,
+  userId: number,
+  showId: number,
+): Set<number> {
+  const rows = db
+    .select({ episodeId: schema.watchedEpisodes.episodeId })
+    .from(schema.watchedEpisodes)
+    .innerJoin(
+      schema.episodes,
+      eq(schema.episodes.id, schema.watchedEpisodes.episodeId),
+    )
+    .where(
+      and(
+        eq(schema.watchedEpisodes.userId, userId),
+        eq(schema.episodes.showId, showId),
+      ),
+    )
+    .all();
+  return new Set(rows.map((r) => r.episodeId));
+}
+
+export function getShowByTmdbId(
+  db: DB,
+  tmdbId: number,
+): schema.Show | undefined {
+  return db
+    .select()
+    .from(schema.shows)
+    .where(eq(schema.shows.tmdbId, tmdbId))
+    .get();
+}
+
+export function getEpisodesByShow(
+  db: DB,
+  showId: number,
+): schema.Episode[] {
+  return db
+    .select()
+    .from(schema.episodes)
+    .where(eq(schema.episodes.showId, showId))
+    .orderBy(asc(schema.episodes.seasonNumber), asc(schema.episodes.episodeNumber))
+    .all();
+}
+
+export function getEpisodeByShowSeasonEp(
+  db: DB,
+  showId: number,
+  seasonNumber: number,
+  episodeNumber: number,
+): schema.Episode | undefined {
+  return db
+    .select()
+    .from(schema.episodes)
+    .where(
+      and(
+        eq(schema.episodes.showId, showId),
+        eq(schema.episodes.seasonNumber, seasonNumber),
+        eq(schema.episodes.episodeNumber, episodeNumber),
+      ),
+    )
+    .get();
+}
+
+export function unmarkEpisodeWatched(
+  db: DB,
+  userId: number,
+  episodeId: number,
+): void {
+  db.delete(schema.watchedEpisodes)
+    .where(
+      and(
+        eq(schema.watchedEpisodes.userId, userId),
+        eq(schema.watchedEpisodes.episodeId, episodeId),
       ),
     )
     .run();

@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { useLocale } from "next-intl";
 import type { CalendarEpisode } from "@/lib/db/queries";
 import { EpisodeEntry } from "./episode-entry";
 
@@ -9,9 +11,17 @@ interface Props {
   month: number;
 }
 
-const DAY_NAMES = ["dl", "dt", "dc", "dj", "dv", "ds", "dg"];
+function getDayNames(locale: string): string[] {
+  const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(2024, 0, i + 1); // 2024-01-01 is Monday
+    return fmt.format(d);
+  });
+}
 
 export function CalendarGrid({ episodes, year, month }: Props) {
+  const locale = useLocale();
+  const dayNames = useMemo(() => getDayNames(locale), [locale]);
   const today = new Date().toISOString().slice(0, 10);
 
   const firstDay = new Date(year, month, 1);
@@ -34,7 +44,7 @@ export function CalendarGrid({ episodes, year, month }: Props) {
   return (
     <div className="hidden md:block">
       <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
-        {DAY_NAMES.map((d) => (
+        {dayNames.map((d) => (
           <div
             key={d}
             className="bg-surface p-2 text-center text-xs font-medium text-muted uppercase"

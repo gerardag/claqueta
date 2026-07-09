@@ -1,0 +1,26 @@
+#!/bin/sh
+# Rebutja commits que no segueixin Conventional Commits.
+# El versionat de releases depèn d'aquest format (.github/workflows/release.yml).
+# S'activa amb:  git config core.hooksPath .githooks
+
+msg=$(head -n1 "$1")
+
+# Permet commits de merge i revert generats per git.
+case "$msg" in
+  "Merge "*|"Revert "*) exit 0 ;;
+esac
+
+# tipus(scope opcional)(! opcional): descripció
+pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?!?: .+'
+
+if printf '%s' "$msg" | grep -Eq "$pattern"; then
+  exit 0
+fi
+
+echo "✖ Missatge de commit no vàlid:" >&2
+echo "  $msg" >&2
+echo >&2
+echo "Cal Conventional Commits. Format: <tipus>: <descripció>" >&2
+echo "Tipus: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert" >&2
+echo "Exemple: feat: afegeix exportació a CSV   (feat! per un canvi incompatible)" >&2
+exit 1

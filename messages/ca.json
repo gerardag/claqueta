@@ -1,12 +1,21 @@
 {
   "app": {
-    "title": "Claqueta 🎬"
+    "title": "Claqueta",
+    "description": "Seguiment de sèries"
+  },
+  "common": {
+    "menu": "Menú",
+    "save": "Desa",
+    "loading": "S'està carregant…",
+    "confirm": "Confirma",
+    "cancel": "Cancel·la"
   },
   "nav": {
     "series": "Les meves sèries",
     "calendar": "Calendari",
     "search": "Cerca",
-    "import": "Importar",
+    "import": "Importació",
+    "library": "Biblioteca",
     "settings": "Configuració"
   },
   "auth": {
@@ -17,7 +26,7 @@
     "name": "Nom",
     "login": "Entra",
     "register": "Registra't",
-    "loading": "Carregant…",
+    "loading": "S'està carregant…",
     "signOut": "Tanca la sessió",
     "noAccount": "No tens compte?",
     "registerLink": "Registra't",
@@ -26,7 +35,8 @@
     "invalidCredentials": "Credencials incorrectes",
     "emailTaken": "Ja existeix un compte amb aquest correu",
     "validationError": "Revisa les dades del formulari",
-    "registrationDisabled": "El registre està desactivat"
+    "registrationDisabled": "El registre està desactivat",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a un minut."
   },
   "pages": {
     "series": {
@@ -35,35 +45,156 @@
       "searchCta": "Cerca sèries",
       "pending": "{count, plural, one {Tens # episodi pendent} other {Tens # episodis pendents}}",
       "nextEpisode": "Nou episodi el {date}",
-      "lastWatched": "Últim episodi vist {time}",
+      "lastWatched": "Darrer episodi vist {time}",
+      "seeLibrary": "Veure biblioteca",
       "sections": {
         "watching": "Estàs mirant",
+        "watchlist": "Watchlist",
         "following": "En seguiment",
         "stale": "Fa temps que no les mires",
         "completed": "Completades",
         "stopped": "Abandonades"
       },
+      "newBadge": "NOU",
+      "upToDate": "Al dia",
       "actions": {
         "continue": "Continua",
         "stop": "Deixa de mirar",
-        "delete": "Elimina"
+        "delete": "Elimina",
+        "resume": "Reprèn",
+        "markWatched": "Marca com a vist"
       }
     },
     "calendar": {
       "title": "Calendari",
       "upcoming": "Properament",
       "today": "Avui",
-      "empty": "No hi ha episodis aquest mes."
+      "todayLabel": "avui",
+      "empty": "No hi ha episodis aquest mes.",
+      "markWatched": "Marca com a vist",
+      "watched": "Vist"
     },
     "search": {
       "title": "Cerca",
-      "placeholder": "Cerca sèries..."
+      "placeholder": "Cerca sèries…",
+      "noResults": "No s'han trobat resultats per a «{query}».",
+      "error": "Hi ha hagut un error. Torna-ho a provar.",
+      "resultCount": "{count, plural, one {# resultat} other {# resultats}}",
+      "track": "Segueix",
+      "tracked": "Afegida",
+      "tracking": "Afegint…"
     },
     "import": {
-      "title": "Importar"
+      "title": "Importació de TVTime",
+      "tvtimeDescription": "Importa les teves sèries i episodis vistos des de TVTime.",
+      "claquetaDescription": "Restaura les teves dades a partir d'un fitxer d'exportació de Claqueta (.json).",
+      "instructions": "Per obtenir les teves dades, ves a TVTime → Ajustos → Compte → Descarregar les meves dades. Rebràs un ZIP per correu.",
+      "dropzone": "Arrossega aquí el ZIP de TVTime o els CSV solts",
+      "dropzoneClaqueta": "Arrossega aquí el fitxer JSON d'exportació de Claqueta",
+      "dropzoneButton": "Selecciona fitxers",
+      "dropzoneHint": "Accepta .zip o .csv (followed_tv_show.csv, seen_episode.csv)",
+      "dropzoneHintClaqueta": "Accepta fitxers .json exportats des de Claqueta",
+      "uploading": "S'està pujant…",
+      "processing": "S'està processant la importació…",
+      "progress": "{processed} de {total} sèries processades",
+      "done": "Importació completada",
+      "error": "Hi ha hagut un error durant la importació",
+      "invalidFormat": "El fitxer no té el format d'exportació de Claqueta vàlid",
+      "alreadyImported": "Ja s'ha completat una importació de TVTime anteriorment.",
+      "resultShows": "{count, plural, one {# sèrie importada} other {# sèries importades}}",
+      "resultEpisodes": "{count, plural, one {# episodi marcat com a vist} other {# episodis marcats com a vistos}}",
+      "resultSkipped": "{count, plural, one {# sèrie omesa} other {# sèries omeses}}",
+      "skippedDetail": "Detall de les sèries omeses",
+      "downloadSkipped": "Descarrega detall",
+      "importAnother": "Importa un altre fitxer",
+      "noFiles": "No s'han trobat fitxers vàlids",
+      "noShows": "No s'han trobat sèries al fitxer",
+      "unzipError": "No s'ha pogut descomprimir el ZIP",
+      "serverError": "Error intern del servidor"
+    },
+    "showDetail": {
+      "season": "Temporada {number}",
+      "seasons": "{count, plural, one {# temporada} other {# temporades}}",
+      "episodes": "{count, plural, one {# episodi} other {# episodis}}",
+      "episodeFallback": "Episodi {number}",
+      "markWatched": "Marca com a vist",
+      "markUnwatched": "Desmarca",
+      "markSeasonWatched": "Marca tota la temporada",
+      "overview": "Sinopsi",
+      "status": "Estat",
+      "statuses": {
+        "Returning Series": "En emissió",
+        "Ended": "Acabada",
+        "Canceled": "Cancel·lada",
+        "In Production": "En producció"
+      },
+      "firstAirDate": "Data d'estrena",
+      "notTracked": "No segueixes aquesta sèrie",
+      "track": "Segueix",
+      "back": "Tornar"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "placeholder": "Cerca a la biblioteca…",
+      "empty": "No tens cap sèrie a la biblioteca.",
+      "searchCta": "Cerca sèries",
+      "noResults": "Cap sèrie coincideix amb «{query}».",
+      "total": "{count, plural, one {# sèrie} other {# sèries}}",
+      "states": {
+        "WATCHING": "Mirant",
+        "FOLLOWING": "Seguint",
+        "COMPLETED": "Completada",
+        "STOPPED": "Abandonada"
+      }
     },
     "settings": {
-      "title": "Configuració"
+      "title": "Configuració",
+      "theme": {
+        "title": "Tema",
+        "description": "Paletes de colors inspirades en el Dictionary of Color Combinations de Sanzo Wada.",
+        "dark": "Foscos",
+        "light": "Clars",
+        "default": "Per defecte",
+        "nit-violeta": "Nit violeta",
+        "bosc-profund": "Bosc profund",
+        "brasa": "Brasa",
+        "mar-de-nit": "Mar de nit",
+        "capvespre": "Capvespre",
+        "tarda-estiu": "Tarda d'estiu",
+        "jardi-japones": "Jardí japonès",
+        "pergami": "Pergamí",
+        "mati-tardor": "Matí de tardor",
+        "lavanda": "Lavanda"
+      },
+      "language": "Idioma",
+      "languageDescription": "Selecciona l'idioma de l'aplicació.",
+      "saved": "Configuració desada",
+      "export": {
+        "title": "Exportació de dades",
+        "description": "Descarrega totes les teves sèries i episodis vistos en format JSON. Útil per fer còpies de seguretat.",
+        "button": "Exporta les dades",
+        "downloading": "S'està descarregant…"
+      },
+      "restore": {
+        "title": "Restauració de dades"
+      },
+      "import": {
+        "title": "Importació de TVTime"
+      }
     }
+  },
+  "footer": {
+    "madeWith": "Fet amb ❤️ des de Sant Celoni.",
+    "tmdbAttribution": "Dades proporcionades per"
+  },
+  "toast": {
+    "episodeWatched": "Episodi marcat com a vist",
+    "seasonWatched": "Temporada marcada com a vista",
+    "showStopped": "Sèrie abandonada",
+    "showDeleted": "Sèrie eliminada",
+    "showResumed": "Sèrie represa",
+    "showCompleted": "Sèrie completada",
+    "showTracked": "Sèrie afegida",
+    "localeSaved": "Idioma actualitzat"
   }
 }

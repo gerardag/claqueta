@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+**/data
+*.db
+*.db-wal
+*.db-shm
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+README.md
+docs/
+.github/
+.githooks/

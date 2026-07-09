@@ -4,19 +4,27 @@ import {
   TvIcon,
   CalendarIcon,
   SearchIcon,
-  DownloadIcon,
+  LibraryIcon,
   SettingsIcon,
 } from "./icons";
 
 export function Sidebar({ userMenu }: { userMenu?: React.ReactNode }) {
   const t = useTranslations("nav");
+  const tApp = useTranslations("app");
 
   return (
     <aside className="flex md:flex-col gap-1 md:gap-0.5 md:w-56 border-b md:border-b-0 md:border-r border-border bg-surface p-2 md:p-3">
-      <div className="hidden md:flex items-center gap-2 px-3 py-3 mb-2">
-        <span className="text-lg font-semibold tracking-tight">
-          Claqueta 🎬
-        </span>
+      <div className="hidden md:flex items-center px-3 py-3 mb-2">
+        <img
+          src="/claqueta-white.svg"
+          alt={tApp("title")}
+          className="logo-dark h-6 w-auto"
+        />
+        <img
+          src="/claqueta-black.svg"
+          alt={tApp("title")}
+          className="logo-light h-6 w-auto"
+        />
       </div>
       <nav className="flex md:flex-col gap-1 flex-1 overflow-x-auto md:overflow-x-visible">
         <NavLink href="/series" icon={<TvIcon />}>
@@ -28,8 +36,8 @@ export function Sidebar({ userMenu }: { userMenu?: React.ReactNode }) {
         <NavLink href="/search" icon={<SearchIcon />}>
           {t("search")}
         </NavLink>
-        <NavLink href="/import" icon={<DownloadIcon />}>
-          {t("import")}
+        <NavLink href="/library" icon={<LibraryIcon />}>
+          {t("library")}
         </NavLink>
         <NavLink href="/settings" icon={<SettingsIcon />}>
           {t("settings")}

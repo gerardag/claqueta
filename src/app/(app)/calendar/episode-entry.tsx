@@ -1,8 +1,10 @@
 "use client";
 
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import type { CalendarEpisode } from "@/lib/db/queries";
 import { markWatchedAction } from "./actions";
+import { useToast } from "@/components/toast";
 
 interface Props {
   episode: CalendarEpisode;
@@ -10,7 +12,10 @@ interface Props {
 }
 
 export function EpisodeEntry({ episode, compact }: Props) {
+  const t = useTranslations("pages.calendar");
+  const tToast = useTranslations("toast");
   const [pending, startTransition] = useTransition();
+  const showToast = useToast();
   const today = new Date().toISOString().slice(0, 10);
   const aired = episode.airDate <= today;
   const canMark = aired && !episode.watched;
@@ -19,6 +24,13 @@ export function EpisodeEntry({ episode, compact }: Props) {
   const posterUrl = episode.posterPath
     ? `https://image.tmdb.org/t/p/w92${episode.posterPath}`
     : null;
+
+  function handleMark() {
+    startTransition(async () => {
+      await markWatchedAction(episode.episodeId);
+      showToast(tToast("episodeWatched"));
+    });
+  }
 
   if (compact) {
     return (
@@ -30,11 +42,9 @@ export function EpisodeEntry({ episode, compact }: Props) {
         {canMark && (
           <button
             disabled={pending}
-            onClick={() =>
-              startTransition(() => markWatchedAction(episode.episodeId))
-            }
-            className="ml-1 text-accent hover:text-accent/80"
-            title="Marca com a vist"
+            onClick={handleMark}
+            className="ml-1 text-accent hover:text-accent/80 focus-visible:outline-accent"
+            title={t("markWatched")}
           >
             ✓
           </button>
@@ -65,12 +75,10 @@ export function EpisodeEntry({ episode, compact }: Props) {
       {canMark && (
         <button
           disabled={pending}
-          onClick={() =>
-            startTransition(() => markWatchedAction(episode.episodeId))
-          }
-          className="px-2 py-1 text-xs rounded bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 flex-shrink-0"
+          onClick={handleMark}
+          className="px-2 py-1 text-xs rounded bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 flex-shrink-0 focus-visible:outline-accent"
         >
-          {pending ? "…" : "✓ Vist"}
+          {pending ? "…" : `✓ ${t("watched")}`}
         </button>
       )}
       {episode.watched && (

@@ -1,0 +1,13 @@
+# Fa pull de la imatge construïda per GitHub Actions (no la construeix localment).
+# Per defecte agafa :latest (l'últim push a main). Per clavar una versió:
+#   VERSION=v1.2.0 docker compose -f docker-compose.prod.yml up -d
+services:
+  claqueta:
+    image: ghcr.io/gerardag/claqueta:${VERSION:-latest}
+    container_name: claqueta
+    ports:
+      - "3210:3000"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

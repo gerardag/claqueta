@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import type { CalendarEpisode } from "@/lib/db/queries";
 import { EpisodeEntry } from "./episode-entry";
 
@@ -8,6 +9,8 @@ interface Props {
 }
 
 export function AgendaView({ episodes }: Props) {
+  const locale = useLocale();
+  const t = useTranslations("pages.calendar");
   const today = new Date().toISOString().slice(0, 10);
 
   const byDate = new Map<string, CalendarEpisode[]>();
@@ -26,7 +29,7 @@ export function AgendaView({ episodes }: Props) {
     <div className="md:hidden space-y-4">
       {dates.map((date) => {
         const isToday = date === today;
-        const formatted = new Date(date + "T00:00:00").toLocaleDateString("ca", {
+        const formatted = new Date(date + "T00:00:00").toLocaleDateString(locale, {
           weekday: "long",
           day: "numeric",
           month: "long",
@@ -38,7 +41,7 @@ export function AgendaView({ episodes }: Props) {
               className={`text-sm font-medium mb-2 capitalize ${isToday ? "text-accent" : "text-muted"}`}
             >
               {formatted}
-              {isToday && " — avui"}
+              {isToday && ` — ${t("todayLabel")}`}
             </h3>
             <div className="space-y-2">
               {byDate.get(date)!.map((ep) => (

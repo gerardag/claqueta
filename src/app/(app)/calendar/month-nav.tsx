@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 interface Props {
   year: number;
@@ -10,9 +10,10 @@ interface Props {
 
 export function MonthNav({ year, month }: Props) {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("pages.calendar");
 
-  const label = new Date(year, month, 1).toLocaleDateString("ca", {
+  const label = new Date(year, month, 1).toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
   });

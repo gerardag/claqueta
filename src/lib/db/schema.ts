@@ -117,7 +117,7 @@ export const watchedEpisodes = sqliteTable(
 );
 
 // ---------------------------------------------------------------------------
-// imports — TVTime import log
+// imports — TVTime import jobs
 // ---------------------------------------------------------------------------
 export const imports = sqliteTable("imports", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -125,14 +125,44 @@ export const imports = sqliteTable("imports", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   source: text("source").notNull().default("tvtime"),
-  totalRows: integer("total_rows").notNull(),
-  importedRows: integer("imported_rows").notNull(),
-  skippedRows: integer("skipped_rows").notNull(),
-  errorsJson: text("errors_json"),
+  status: text("status", {
+    enum: ["pending", "running", "done", "error"],
+  })
+    .notNull()
+    .default("pending"),
+  totalShows: integer("total_shows").notNull().default(0),
+  processedShows: integer("processed_shows").notNull().default(0),
+  importedShows: integer("imported_shows").notNull().default(0),
+  importedEpisodes: integer("imported_episodes").notNull().default(0),
+  skippedShows: integer("skipped_shows").notNull().default(0),
+  skippedJson: text("skipped_json"),
+  csvDataJson: text("csv_data_json"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
 });
+
+// ---------------------------------------------------------------------------
+// tvdb_tmdb_map — persistent TVDB→TMDB ID mapping cache
+// ---------------------------------------------------------------------------
+export const tvdbTmdbMap = sqliteTable("tvdb_tmdb_map", {
+  tvdbId: integer("tvdb_id").primaryKey(),
+  tmdbId: integer("tmdb_id"),
+  resolvedAt: integer("resolved_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+// ---------------------------------------------------------------------------
+// tmdb_cache — HTTP-level cache for TMDB API responses
+// ---------------------------------------------------------------------------
+export const tmdbCache = sqliteTable("tmdb_cache", {
+  key: text("key").primaryKey(),
+  payloadJson: text("payload_json").notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+});
+
+export type TmdbCacheEntry = InferSelectModel<typeof tmdbCache>;
 
 // ---------------------------------------------------------------------------
 // Type exports
@@ -154,3 +184,5 @@ export type NewWatchedEpisode = InferInsertModel<typeof watchedEpisodes>;
 
 export type Import = InferSelectModel<typeof imports>;
 export type NewImport = InferInsertModel<typeof imports>;
+
+export type TvdbTmdbMapEntry = InferSelectModel<typeof tvdbTmdbMap>;

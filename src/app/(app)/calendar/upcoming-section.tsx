@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { CalendarEpisode } from "@/lib/db/queries";
 import { EpisodeEntry } from "./episode-entry";
 
@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function UpcomingSection({ episodes }: Props) {
+  const locale = useLocale();
   const t = useTranslations("pages.calendar");
 
   if (episodes.length === 0) return null;
@@ -20,7 +21,7 @@ export function UpcomingSection({ episodes }: Props) {
         {episodes.map((ep) => (
           <div key={ep.episodeId}>
             <p className="text-xs text-muted mb-1">
-              {new Date(ep.airDate + "T00:00:00").toLocaleDateString("ca", {
+              {new Date(ep.airDate + "T00:00:00").toLocaleDateString(locale, {
                 weekday: "short",
                 day: "numeric",
                 month: "short",

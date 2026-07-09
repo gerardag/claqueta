@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { Toaster } from "@/components/toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +14,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Claqueta 🎬",
-  description: "Seguiment de sèries",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("app");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -30,11 +33,21 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=document.cookie.match(/(?:^|;)\\s*theme=([^;]+)/);if(t&&t[1]!=='default')document.documentElement.setAttribute('data-theme',t[1])}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="h-full">
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <Toaster>
+            {children}
+          </Toaster>
         </NextIntlClientProvider>
       </body>
     </html>

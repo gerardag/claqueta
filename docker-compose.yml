@@ -1,0 +1,10 @@
+services:
+  claqueta:
+    build: .
+    container_name: claqueta
+    ports:
+      - "3210:3000"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ */
+/* Default theme (dark neutral)                                       */
+/* ------------------------------------------------------------------ */
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
@@ -8,6 +11,124 @@
   --border: #262626;
   --muted: #737373;
   --accent: #3b82f6;
+}
+
+/* ------------------------------------------------------------------ */
+/* Light themes — Wada Sanzo palettes                                 */
+/* ------------------------------------------------------------------ */
+
+/* #166: Grenadine Pink + Naples Yellow + Deep Slate Green */
+[data-theme="tarda-estiu"] {
+  --background: #faf6e8;
+  --foreground: #0f261f;
+  --surface: #f5f0de;
+  --surface-hover: #eee9d2;
+  --border: #ddd6c0;
+  --muted: #6b7a6f;
+  --accent: #e85560;
+}
+
+/* #207: Sudan Brown + Glaucous Green + Black */
+[data-theme="jardi-japones"] {
+  --background: #f2f8f4;
+  --foreground: #1a1a1a;
+  --surface: #e8f2ec;
+  --surface-hover: #dceae2;
+  --border: #c5d9cb;
+  --muted: #6b8574;
+  --accent: #9b5348;
+}
+
+/* #296: Sulpher Yellow + Ochraceous Salmon + Pale Raw Umber + Slate */
+[data-theme="pergami"] {
+  --background: #f8f6ee;
+  --foreground: #1b3644;
+  --surface: #f0ede2;
+  --surface-hover: #e8e4d6;
+  --border: #d5cfc0;
+  --muted: #7d7560;
+  --accent: #c88a5a;
+}
+
+/* #310: Sulpher Yellow + Pinkish Cinnamon + Olive + Deep Slate Olive */
+[data-theme="mati-tardor"] {
+  --background: #f6f4e6;
+  --foreground: #172713;
+  --surface: #edeadb;
+  --surface-hover: #e4e0ce;
+  --border: #d1ccb8;
+  --muted: #6b7358;
+  --accent: #718600;
+}
+
+/* #261: Red + Pale Lemon Yellow + Calamine Blue + Warm Gray */
+[data-theme="lavanda"] {
+  --background: #f7f8f4;
+  --foreground: #2a3230;
+  --surface: #eef0ea;
+  --surface-hover: #e4e8e0;
+  --border: #cbd2c8;
+  --muted: #7e8d81;
+  --accent: #a10045;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark themes — Wada Sanzo palettes                                  */
+/* ------------------------------------------------------------------ */
+
+/* #289: Lemon Yellow + Light Green Yellow + Violet Blue + Violet Black */
+[data-theme="nit-violeta"] {
+  --background: #0e0d18;
+  --foreground: #e8ecd0;
+  --surface: #16141f;
+  --surface-hover: #1e1b28;
+  --border: #2e2a3a;
+  --muted: #8882a8;
+  --accent: #bdf226;
+}
+
+/* #345: Hay's Russet + Nile Blue + Venice Green + Blue Violet */
+[data-theme="bosc-profund"] {
+  --background: #0a1210;
+  --foreground: #bfffe6;
+  --surface: #121e1a;
+  --surface-hover: #1a2a24;
+  --border: #253530;
+  --muted: #5e8a78;
+  --accent: #6bffb3;
+}
+
+/* #323: Cinnamon Buff + Madder Brown + Black */
+[data-theme="brasa"] {
+  --background: #0e0906;
+  --foreground: #f0dcc8;
+  --surface: #1a120c;
+  --surface-hover: #241a12;
+  --border: #3a2818;
+  --muted: #8a7060;
+  --accent: #e5a85e;
+}
+
+/* #139: Salvia Blue + Deep Indigo + Neutral Gray */
+[data-theme="mar-de-nit"] {
+  --background: #0a0e18;
+  --foreground: #b5d1cc;
+  --surface: #111620;
+  --surface-hover: #181e2a;
+  --border: #252d3a;
+  --muted: #607888;
+  --accent: #96bfe6;
+}
+
+/* #265: Old Rose + Apricot Yellow + Olive Yellow + Violet Black */
+[data-theme="capvespre"] {
+  --background: #0e0c14;
+  --foreground: #e0dcc0;
+  --surface: #15131c;
+  --surface-hover: #1d1a26;
+  --border: #2d2938;
+  --muted: #857e9a;
+  --accent: #d94d99;
 }
 
 @theme inline {
@@ -25,4 +146,47 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* ------------------------------------------------------------------ */
+/* Logo — swap between black/white variants depending on theme        */
+/* ------------------------------------------------------------------ */
+.logo-dark {
+  display: block;
+}
+.logo-light {
+  display: none;
+}
+[data-theme="tarda-estiu"] .logo-dark,
+[data-theme="jardi-japones"] .logo-dark,
+[data-theme="pergami"] .logo-dark,
+[data-theme="mati-tardor"] .logo-dark,
+[data-theme="lavanda"] .logo-dark {
+  display: none;
+}
+[data-theme="tarda-estiu"] .logo-light,
+[data-theme="jardi-japones"] .logo-light,
+[data-theme="pergami"] .logo-light,
+[data-theme="mati-tardor"] .logo-light,
+[data-theme="lavanda"] .logo-light {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-from-bottom-2 {
+  from { transform: translateY(0.5rem); }
+  to { transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fade-in 0.15s ease-out, slide-in-from-bottom-2 0.15s ease-out;
 }
