@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ShowSearchResult } from "@/lib/tmdb/dto";
 import { useToast } from "@/components/toast";
+import { TvIcon } from "@/components/icons";
 
 type TrackingState = "idle" | "loading" | "tracked" | "error";
 
@@ -21,26 +22,29 @@ function SearchResultCard({
   const t = useTranslations("pages.search");
 
   return (
-    <div className="group bg-surface rounded-lg overflow-hidden border border-border hover:border-accent/50 transition-colors">
+    <div
+      className="group bg-surface overflow-hidden border border-border hover:border-foreground/50 transition-colors"
+      style={{ borderRadius: "var(--radius-md)" }}
+    >
       <Link href={`/series/${show.id}`}>
-        <div className="aspect-[2/3] relative bg-surface-hover">
+        <div className="aspect-[2/3] relative bg-surface-hover overflow-hidden">
           {show.posterUrl ? (
             <img
               src={show.posterUrl}
               alt={show.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted text-sm">
-              🎬
+            <div className="w-full h-full flex items-center justify-center text-muted">
+              <TvIcon className="size-8" />
             </div>
           )}
         </div>
       </Link>
       <div className="p-2">
         <Link href={`/series/${show.id}`}>
-          <p className="text-sm font-medium truncate hover:text-accent transition-colors">
+          <p className="font-display font-semibold text-sm truncate hover:text-foreground/70 transition-colors">
             {show.name}
           </p>
         </Link>
@@ -50,7 +54,7 @@ function SearchResultCard({
         <button
           onClick={() => onTrack(show.id)}
           disabled={trackingState === "loading" || trackingState === "tracked"}
-          className="mt-2 w-full text-xs font-medium px-2 py-1.5 rounded bg-accent/10 text-accent hover:bg-accent/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="mt-2 w-full text-xs font-medium px-2 py-1.5 rounded bg-accent text-accent-fg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
         >
           {trackingState === "tracked"
             ? `✓ ${t("tracked")}`
@@ -146,7 +150,7 @@ function SearchPageContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-4">{t("title")}</h1>
+      <h1 className="font-display font-bold text-2xl tracking-tight mb-4">{t("title")}</h1>
 
       <input
         type="search"
@@ -154,12 +158,12 @@ function SearchPageContent() {
         value={query}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={t("placeholder")}
-        className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted focus:outline-none focus:border-accent transition-colors mb-6"
+        className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted focus:outline-none focus:border-foreground transition-colors mb-6"
       />
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="h-6 w-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+          <div className="h-6 w-6 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 

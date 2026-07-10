@@ -88,16 +88,24 @@ export default async function ShowDetailPage({ params }: Props) {
     <div className="max-w-4xl mx-auto">
       <BackButton />
 
+      {detail.backdropUrl && (
+        <img
+          src={detail.backdropUrl}
+          alt=""
+          className="w-full aspect-video object-cover rounded-lg mb-6 sm:hidden"
+        />
+      )}
+
       <div className="flex flex-col sm:flex-row gap-6 mb-8">
         {detail.posterUrl && (
           <img
             src={detail.posterUrl}
             alt={detail.name}
-            className="w-48 rounded-lg self-start"
+            className="w-48 rounded-lg self-start hidden sm:block"
           />
         )}
         <div className="flex-1">
-          <h1 className="text-2xl font-semibold mb-2">{detail.name}</h1>
+          <h1 className="font-display font-bold text-2xl tracking-tight mb-2">{detail.name}</h1>
           {detail.originalName !== detail.name && (
             <p className="text-sm text-muted mb-2">{detail.originalName}</p>
           )}

@@ -35,7 +35,7 @@ export function EpisodeEntry({ episode, compact }: Props) {
   if (compact) {
     return (
       <div
-        className={`text-[10px] leading-tight px-1 py-0.5 rounded truncate ${episode.watched ? "text-muted line-through" : canMark ? "bg-accent/10 text-foreground" : "text-muted"}`}
+        className={`text-[10px] leading-tight px-1 py-0.5 rounded truncate ${episode.watched ? "text-muted line-through" : canMark ? "bg-foreground/10 text-foreground" : "text-muted"}`}
       >
         <span className="font-medium">{episode.showName}</span>{" "}
         <span className="text-muted">{seasonEp}</span>
@@ -43,7 +43,7 @@ export function EpisodeEntry({ episode, compact }: Props) {
           <button
             disabled={pending}
             onClick={handleMark}
-            className="ml-1 text-accent hover:text-accent/80 focus-visible:outline-accent"
+            className="ml-1 text-foreground hover:opacity-80 focus-visible:outline-accent"
             title={t("markWatched")}
           >
             ✓
@@ -76,7 +76,7 @@ export function EpisodeEntry({ episode, compact }: Props) {
         <button
           disabled={pending}
           onClick={handleMark}
-          className="px-2 py-1 text-xs rounded bg-accent/10 text-accent hover:bg-accent/20 transition-colors disabled:opacity-50 flex-shrink-0 focus-visible:outline-accent"
+          className="px-2 py-1 text-xs rounded bg-accent text-accent-fg hover:opacity-90 transition-opacity disabled:opacity-50 flex-shrink-0 focus-visible:outline-accent"
         >
           {pending ? "…" : `✓ ${t("watched")}`}
         </button>

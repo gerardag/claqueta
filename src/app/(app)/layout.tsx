@@ -9,10 +9,14 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  const name = session?.user?.name ?? "";
 
   return (
     <div className="flex flex-col min-h-full">
-      <Header userMenu={<UserMenu name={session?.user?.name ?? ""} />} />
+      <Header
+        userMenu={<UserMenu name={name} />}
+        mobileUserMenu={<UserMenu name={name} variant="stacked" />}
+      />
       <main className="mx-auto w-full max-w-[1024px] flex-1 px-4 py-4">
         {children}
       </main>

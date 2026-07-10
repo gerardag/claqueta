@@ -62,12 +62,12 @@ export function CalendarGrid({ episodes, year, month }: Props) {
           return (
             <div
               key={i}
-              className={`bg-surface min-h-24 p-1.5 ${!day ? "bg-surface/50" : ""} ${isToday ? "ring-1 ring-inset ring-accent" : ""}`}
+              className={`bg-surface min-h-24 p-1.5 ${!day ? "bg-surface/50" : ""} ${isToday ? "ring-1 ring-inset ring-foreground" : ""}`}
             >
               {day && (
                 <>
                   <span
-                    className={`text-xs font-medium ${isToday ? "text-accent" : "text-muted"} ${dayEpisodes.length > 0 ? "font-bold text-foreground" : ""}`}
+                    className={`text-xs font-medium ${isToday ? "text-foreground font-bold" : "text-muted"} ${dayEpisodes.length > 0 ? "font-bold text-foreground" : ""}`}
                   >
                     {day}
                   </span>

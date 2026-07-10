@@ -25,7 +25,7 @@ export function ShowActions({ tmdbId, userShow }: Props) {
             await changeShowStateAction(tmdbId, "WATCHING");
             showToast(tToast("showResumed"));
           }}
-          className="text-sm bg-accent text-white px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
+          className="text-sm bg-accent text-accent-fg px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
         >
           {t("actions.resume")}
         </button>

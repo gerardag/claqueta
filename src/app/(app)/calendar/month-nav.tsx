@@ -49,7 +49,7 @@ export function MonthNav({ year, month }: Props) {
       </button>
       <button
         onClick={goToday}
-        className="ml-2 px-3 py-1 text-sm rounded bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+        className="ml-2 px-3 py-1 text-sm rounded bg-accent text-accent-fg hover:opacity-90 transition-opacity"
       >
         {t("today")}
       </button>

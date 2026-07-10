@@ -146,8 +146,8 @@ export function ImportSection({
         <div
           className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
             dragging
-              ? "border-accent bg-accent/10"
-              : "border-border hover:border-accent/50"
+              ? "border-foreground bg-foreground/10"
+              : "border-border hover:border-foreground/50"
           }`}
           onDragOver={(e) => {
             e.preventDefault();
@@ -160,7 +160,7 @@ export function ImportSection({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors text-sm"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity text-sm"
           >
             {t("dropzoneButton")}
           </button>
@@ -178,7 +178,7 @@ export function ImportSection({
 
       {phase === "uploading" && (
         <div className="text-center py-8">
-          <div className="animate-spin inline-block w-6 h-6 border-2 border-accent border-t-transparent rounded-full mb-3" />
+          <div className="animate-spin inline-block w-6 h-6 border-2 border-foreground border-t-transparent rounded-full mb-3" />
           <p className="text-sm">{t("uploading")}</p>
         </div>
       )}
@@ -188,7 +188,7 @@ export function ImportSection({
           <p className="mb-3 font-medium text-sm">{t("processing")}</p>
           <div className="w-full bg-border rounded-full h-2.5 mb-2">
             <div
-              className="bg-accent h-2.5 rounded-full transition-all duration-300"
+              className="bg-foreground h-2.5 rounded-full transition-all duration-300"
               style={{
                 width: `${importStatus.totalShows > 0 ? (importStatus.processedShows / importStatus.totalShows) * 100 : 0}%`,
               }}
@@ -205,7 +205,7 @@ export function ImportSection({
 
       {phase === "processing" && !importStatus && (
         <div className="text-center py-8">
-          <div className="animate-spin inline-block w-6 h-6 border-2 border-accent border-t-transparent rounded-full mb-3" />
+          <div className="animate-spin inline-block w-6 h-6 border-2 border-foreground border-t-transparent rounded-full mb-3" />
           <p className="text-sm">{t("processing")}</p>
         </div>
       )}
@@ -249,7 +249,7 @@ export function ImportSection({
               <button
                 type="button"
                 onClick={downloadSkipped}
-                className="mt-2 text-xs text-accent hover:underline"
+                className="mt-2 text-xs text-foreground hover:underline"
               >
                 {t("downloadSkipped")}
               </button>
@@ -259,7 +259,7 @@ export function ImportSection({
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors text-sm"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity text-sm"
           >
             {t("importAnother")}
           </button>
@@ -276,7 +276,7 @@ export function ImportSection({
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors text-sm"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity text-sm"
           >
             {t("importAnother")}
           </button>

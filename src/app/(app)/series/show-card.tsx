@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { ShowWithProgress } from "@/lib/db/queries";
 import { stopShowAction, deleteShowAction } from "./actions";
 import { useToast } from "@/components/toast";
+import { TvIcon } from "@/components/icons";
 
 export function ShowCard({ show }: { show: ShowWithProgress }) {
   const t = useTranslations("pages.series");
@@ -32,26 +33,32 @@ export function ShowCard({ show }: { show: ShowWithProgress }) {
   }, [menuOpen]);
 
   return (
-    <div className="group relative bg-surface rounded-lg border border-border hover:border-accent/50 transition-colors">
+    <div
+      className="group relative bg-surface border border-border hover:border-foreground/50 transition-colors"
+      style={{ borderRadius: "var(--radius-md)" }}
+    >
       <Link href={`/series/${show.tmdbId}`}>
-        <div className="aspect-[2/3] relative bg-surface-hover rounded-t-lg overflow-hidden">
+        <div
+          className="aspect-[2/3] relative bg-surface-hover overflow-hidden"
+          style={{ borderTopLeftRadius: "var(--radius-md)", borderTopRightRadius: "var(--radius-md)" }}
+        >
           {posterUrl ? (
             <img
               src={posterUrl}
               alt={show.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted text-sm">
-              🎬
+            <div className="w-full h-full flex items-center justify-center text-muted">
+              <TvIcon className="size-8" />
             </div>
           )}
         </div>
       </Link>
       <div className="p-2">
         <div className="flex items-start justify-between gap-1">
-          <p className="text-sm font-medium truncate flex-1">{show.name}</p>
+          <p className="font-display font-semibold text-sm truncate flex-1">{show.name}</p>
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -91,7 +98,7 @@ export function ShowCard({ show }: { show: ShowWithProgress }) {
           </div>
         </div>
         {show.nextAirDate && (
-          <p className="text-xs text-accent mt-1">
+          <p className="text-xs text-foreground mt-1">
             {t("nextEpisode", { date: formatAirDate(show.nextAirDate, locale) })}
           </p>
         )}

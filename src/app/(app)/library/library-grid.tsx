@@ -4,12 +4,13 @@ import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { LibraryShow } from "@/lib/db/queries";
+import { SearchIcon, TvIcon } from "@/components/icons";
 
-const STATE_COLORS: Record<string, string> = {
-  WATCHING: "bg-accent/15 text-accent",
-  FOLLOWING: "bg-blue-500/15 text-blue-400",
-  COMPLETED: "bg-green-500/15 text-green-400",
-  STOPPED: "bg-neutral-500/15 text-muted",
+const STATE_COLORS: Record<string, { background: string; color: string }> = {
+  WATCHING: { background: "var(--status-watching-bg)", color: "var(--status-watching-fg)" },
+  FOLLOWING: { background: "var(--status-following-bg)", color: "var(--status-following-fg)" },
+  COMPLETED: { background: "var(--status-completed-bg)", color: "var(--status-completed-fg)" },
+  STOPPED: { background: "var(--status-stopped-bg)", color: "var(--status-stopped-fg)" },
 };
 
 export function LibraryGrid({ shows }: { shows: LibraryShow[] }) {
@@ -40,25 +41,13 @@ export function LibraryGrid({ shows }: { shows: LibraryShow[] }) {
     <div>
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 shrink-0 text-muted" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("placeholder")}
-            className="w-full pl-10 pr-4 py-2 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:border-accent transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
       </div>
@@ -68,7 +57,7 @@ export function LibraryGrid({ shows }: { shows: LibraryShow[] }) {
           onClick={() => setStateFilter(null)}
           className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
             stateFilter === null
-              ? "bg-accent text-white"
+              ? "bg-accent text-accent-fg"
               : "bg-surface-hover text-muted hover:text-foreground"
           }`}
         >
@@ -84,7 +73,7 @@ export function LibraryGrid({ shows }: { shows: LibraryShow[] }) {
                 }
                 className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
                   stateFilter === state
-                    ? "bg-accent text-white"
+                    ? "bg-accent text-accent-fg"
                     : "bg-surface-hover text-muted hover:text-foreground"
                 }`}
               >
@@ -123,24 +112,25 @@ function LibraryCard({ show }: { show: LibraryShow }) {
   return (
     <Link
       href={`/series/${show.tmdbId}`}
-      className="bg-surface rounded-lg overflow-hidden border border-border hover:border-accent/50 transition-colors"
+      className="group bg-surface overflow-hidden border border-border hover:border-foreground/50 transition-colors"
+      style={{ borderRadius: "var(--radius-md)" }}
     >
-      <div className="aspect-[2/3] relative bg-surface-hover">
+      <div className="aspect-[2/3] relative bg-surface-hover overflow-hidden">
         {posterUrl ? (
           <img
             src={posterUrl}
             alt={show.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted text-sm">
-            🎬
+          <div className="w-full h-full flex items-center justify-center text-muted">
+            <TvIcon className="size-8" />
           </div>
         )}
       </div>
       <div className="p-2">
-        <p className="text-sm font-medium truncate">{show.name}</p>
+        <p className="font-display font-semibold text-sm truncate">{show.name}</p>
         <div className="mt-1">
           <div className="h-1.5 bg-border rounded-full overflow-hidden">
             <div
@@ -153,7 +143,8 @@ function LibraryCard({ show }: { show: LibraryShow }) {
           </p>
         </div>
         <span
-          className={`inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-1 ${STATE_COLORS[show.state]}`}
+          className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-1"
+          style={STATE_COLORS[show.state]}
         >
           {t(`states.${show.state}`)}
         </span>

@@ -170,7 +170,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
           pendingEpisodesAreOld
         ) {
           stale.push(item);
-        } else if (pending === 0 && !row.nextAirDate) {
+        } else if (pending === 0) {
           following.push(item);
         } else {
           watching.push(item);

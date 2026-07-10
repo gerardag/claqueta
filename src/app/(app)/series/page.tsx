@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getUserShowsGrouped } from "@/lib/db/queries";
 import { ShowCard } from "./show-card";
 import { WatchingCard } from "./watching-card";
+import { ClapperboardIcon, LibraryIcon } from "@/components/icons";
 import Link from "next/link";
 
 export default async function SeriesPage() {
@@ -23,12 +24,13 @@ export default async function SeriesPage() {
   if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <p className="text-6xl mb-4">🎬</p>
-        <h1 className="text-2xl font-semibold mb-2">{t("title")}</h1>
+        <ClapperboardIcon className="size-14 text-muted mb-4" />
+        <h1 className="font-display font-bold text-3xl tracking-tight mb-2">{t("title")}</h1>
         <p className="text-muted mb-6">{t("empty")}</p>
         <Link
           href="/search"
-          className="bg-accent text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+          className="bg-accent text-accent-fg px-4 py-2 font-medium hover:opacity-90 transition-opacity"
+          style={{ borderRadius: "var(--radius-pill)" }}
         >
           {t("searchCta")}
         </Link>
@@ -38,11 +40,11 @@ export default async function SeriesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">{t("title")}</h1>
+      <h1 className="font-display font-bold text-3xl tracking-tight mb-6">{t("title")}</h1>
 
       {watching.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-lg font-medium mb-3">{t("sections.watching")}</h2>
+          <h2 className="font-display font-semibold text-lg mb-3">{t("sections.watching")}</h2>
           <div className="flex flex-col gap-2">
             {watching.map((show) => (
               <WatchingCard key={show.userShowId} show={show} />
@@ -53,8 +55,9 @@ export default async function SeriesPage() {
 
       {watchlist.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-lg font-medium mb-3">
-            {t("sections.watchlist")} 📋
+          <h2 className="font-display font-semibold text-lg mb-3 flex items-center gap-2">
+            {t("sections.watchlist")}
+            <LibraryIcon className="size-4 text-muted" />
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {watchlist.map((show) => (
@@ -67,10 +70,10 @@ export default async function SeriesPage() {
       {following.length > 0 && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-medium">{t("sections.following")}</h2>
+            <h2 className="font-display font-semibold text-lg">{t("sections.following")}</h2>
             <Link
               href="/library"
-              className="text-sm text-accent hover:opacity-80 transition-opacity"
+              className="text-sm text-foreground hover:opacity-70 transition-opacity"
             >
               {t("seeLibrary")}
             </Link>

@@ -94,7 +94,7 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
               }}
               aria-label={t("markSeasonWatched")}
               title={t("markSeasonWatched")}
-              className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-muted hover:border-accent/50 hover:text-accent transition-colors focus-visible:outline-accent"
+              className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-muted hover:border-foreground/50 hover:text-foreground transition-colors focus-visible:outline-accent"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -110,13 +110,13 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => markWatched(false)}
-              className="text-xs bg-surface border border-border px-2.5 py-1 rounded-md hover:border-accent/50 transition-colors focus-visible:outline-accent"
+              className="text-xs bg-surface border border-border px-2.5 py-1 rounded-md hover:border-foreground/50 transition-colors focus-visible:outline-accent"
             >
               {t("previousSeasonsOnlyThis")}
             </button>
             <button
               onClick={() => markWatched(true)}
-              className="text-xs bg-accent text-white px-2.5 py-1 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
+              className="text-xs bg-accent text-accent-fg px-2.5 py-1 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
             >
               {t("previousSeasonsAlsoPrevious")}
             </button>
@@ -157,8 +157,8 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
                   disabled={!ep.aired}
                   className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
                     ep.watched
-                      ? "bg-accent border-accent text-white"
-                      : "border-border hover:border-accent/50"
+                      ? "bg-accent border-accent text-accent-fg"
+                      : "border-border hover:border-foreground/50"
                   } ${!ep.aired ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   {ep.watched && (

@@ -134,7 +134,7 @@ export default function ImportPage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">{t("title")}</h1>
+      <h1 className="font-display font-bold text-2xl tracking-tight mb-2">{t("title")}</h1>
       <p className="text-muted mb-1">{t("tvtimeDescription")}</p>
       <p className="text-sm text-muted mb-6">{t("instructions")}</p>
 
@@ -142,8 +142,8 @@ export default function ImportPage() {
         <div
           className={`border-2 border-dashed rounded-xl p-10 text-center transition-colors ${
             dragging
-              ? "border-accent bg-accent/10"
-              : "border-border hover:border-accent/50"
+              ? "border-foreground bg-foreground/10"
+              : "border-border hover:border-foreground/50"
           }`}
           onDragOver={(e) => {
             e.preventDefault();
@@ -156,7 +156,7 @@ export default function ImportPage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity"
           >
             {t("dropzoneButton")}
           </button>
@@ -174,7 +174,7 @@ export default function ImportPage() {
 
       {phase === "uploading" && (
         <div className="text-center py-10">
-          <div className="animate-spin inline-block w-8 h-8 border-2 border-accent border-t-transparent rounded-full mb-3" />
+          <div className="animate-spin inline-block w-8 h-8 border-2 border-foreground border-t-transparent rounded-full mb-3" />
           <p>{t("uploading")}</p>
         </div>
       )}
@@ -184,7 +184,7 @@ export default function ImportPage() {
           <p className="mb-3 font-medium">{t("processing")}</p>
           <div className="w-full bg-border rounded-full h-3 mb-2">
             <div
-              className="bg-accent h-3 rounded-full transition-all duration-300"
+              className="bg-foreground h-3 rounded-full transition-all duration-300"
               style={{
                 width: `${importStatus.totalShows > 0 ? (importStatus.processedShows / importStatus.totalShows) * 100 : 0}%`,
               }}
@@ -201,7 +201,7 @@ export default function ImportPage() {
 
       {phase === "processing" && !importStatus && (
         <div className="text-center py-10">
-          <div className="animate-spin inline-block w-8 h-8 border-2 border-accent border-t-transparent rounded-full mb-3" />
+          <div className="animate-spin inline-block w-8 h-8 border-2 border-foreground border-t-transparent rounded-full mb-3" />
           <p>{t("processing")}</p>
         </div>
       )}
@@ -243,7 +243,7 @@ export default function ImportPage() {
               <button
                 type="button"
                 onClick={downloadSkipped}
-                className="mt-3 text-sm text-accent hover:underline"
+                className="mt-3 text-sm text-foreground hover:underline"
               >
                 {t("downloadSkipped")}
               </button>
@@ -253,7 +253,7 @@ export default function ImportPage() {
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity"
           >
             {t("importAnother")}
           </button>
@@ -270,7 +270,7 @@ export default function ImportPage() {
           <button
             type="button"
             onClick={reset}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors"
+            className="px-4 py-2 bg-accent text-accent-fg rounded-lg hover:opacity-90 transition-opacity"
           >
             {t("importAnother")}
           </button>

@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { imports } from "@/lib/db/schema";
 import { LocaleSelector } from "./locale-selector";
 import { ThemeSelector } from "@/components/theme-selector";
+import { UserMenu } from "@/components/user-menu";
 import { ExportSection } from "./export-section";
 import { ImportSection, TvTimeImportDone } from "./import-section";
 
@@ -31,7 +32,12 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-lg space-y-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display font-bold text-2xl tracking-tight">{t("title")}</h1>
+
+      <section className="md:hidden bg-surface rounded-lg border border-border p-4">
+        <h2 className="text-sm font-medium mb-3">{t("account.title")}</h2>
+        <UserMenu name={session?.user?.name ?? ""} />
+      </section>
 
       <section className="bg-surface rounded-lg border border-border p-4">
         <h2 className="text-sm font-medium mb-1">{t("theme.title")}</h2>

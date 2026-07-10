@@ -16,7 +16,7 @@ export default function RegisterPage() {
       <RegisterForm />
       <p className="text-center text-sm text-muted">
         {t("hasAccount")}{" "}
-        <Link href="/login" className="text-accent hover:underline">
+        <Link href="/login" className="text-foreground hover:underline">
           {t("loginLink")}
         </Link>
       </p>

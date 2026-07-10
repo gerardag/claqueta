@@ -40,7 +40,7 @@ function groupShows(items: ShowWithProgress[], staleDays = 45) {
           watchlist.push(item);
         } else if (item.lastActivityAt <= staleThreshold) {
           stale.push(item);
-        } else if (pending === 0 && !item.nextAirDate) {
+        } else if (pending === 0) {
           following.push(item);
         } else {
           watching.push(item);
@@ -93,6 +93,18 @@ describe("groupShows", () => {
     });
     const groups = groupShows([show]);
     expect(groups.following).toHaveLength(1);
+  });
+
+  it("puts WATCHING with no pending but a future nextAirDate in following", () => {
+    const show = makeShow({
+      state: "WATCHING",
+      watched: 10,
+      totalAired: 10,
+      nextAirDate: "2099-01-01",
+    });
+    const groups = groupShows([show]);
+    expect(groups.following).toHaveLength(1);
+    expect(groups.watching).toHaveLength(0);
   });
 
   it("puts active WATCHING with pending episodes in watching", () => {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ShowWithProgress } from "@/lib/db/queries";
 import { markNextEpisodeAction } from "./actions";
 import { useToast } from "@/components/toast";
+import { TvIcon } from "@/components/icons";
 
 export function WatchingCard({ show }: { show: ShowWithProgress }) {
   const t = useTranslations("pages.series");
@@ -19,21 +20,24 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
   const isNew = ep?.airDate ? isRecent(ep.airDate) : false;
 
   return (
-    <div className="flex items-stretch bg-surface rounded-lg border border-border hover:border-accent/50 transition-colors overflow-hidden">
+    <div
+      className="group flex items-stretch bg-surface border border-border hover:border-foreground/50 transition-colors overflow-hidden"
+      style={{ borderRadius: "var(--radius-md)" }}
+    >
       <Link
         href={`/series/${show.tmdbId}`}
-        className="w-20 sm:w-24 flex-shrink-0"
+        className="w-20 sm:w-24 flex-shrink-0 overflow-hidden"
       >
         {posterUrl ? (
           <img
             src={posterUrl}
             alt={show.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             loading="lazy"
           />
         ) : (
           <div className="w-full h-full bg-surface-hover flex items-center justify-center text-muted">
-            🎬
+            <TvIcon className="size-6" />
           </div>
         )}
       </Link>
@@ -42,7 +46,7 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
         <div className="min-w-0">
           <Link
             href={`/series/${show.tmdbId}`}
-            className="text-sm font-medium hover:text-accent transition-colors truncate block"
+            className="font-display font-semibold text-sm hover:text-foreground/70 transition-colors truncate block"
           >
             {show.name}
           </Link>
@@ -62,7 +66,7 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
                 <p className="text-xs text-muted mt-0.5 truncate">{ep.name}</p>
               )}
               {isNew && (
-                <span className="inline-block text-[10px] font-bold bg-accent text-white px-1.5 py-0.5 rounded mt-1 uppercase">
+                <span className="inline-block text-[10px] font-bold bg-accent text-accent-fg px-1.5 py-0.5 rounded mt-1 uppercase">
                   {t("newBadge")}
                 </span>
               )}
@@ -73,7 +77,7 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
             <p className="text-xs text-muted mt-0.5">
               ✓ {t("upToDate")}
               {show.nextAirDate && (
-                <span className="text-accent ml-1">
+                <span className="text-foreground ml-1">
                   · {t("nextEpisode", { date: formatAirDate(show.nextAirDate, locale) })}
                 </span>
               )}
@@ -92,7 +96,7 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
               );
               showToast(tToast("episodeWatched"));
             }}
-            className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-border hover:border-accent hover:text-accent text-muted transition-colors flex items-center justify-center focus-visible:outline-accent"
+            className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-border hover:border-foreground hover:text-foreground text-muted transition-colors flex items-center justify-center focus-visible:outline-accent"
             aria-label={t("actions.markWatched")}
           >
             <svg

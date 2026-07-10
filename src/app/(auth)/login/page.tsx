@@ -12,7 +12,7 @@ export default function LoginPage() {
       {process.env.ALLOW_REGISTRATION !== "false" && (
         <p className="text-center text-sm text-muted">
           {t("noAccount")}{" "}
-          <Link href="/registre" className="text-accent hover:underline">
+          <Link href="/registre" className="text-foreground hover:underline">
             {t("registerLink")}
           </Link>
         </p>

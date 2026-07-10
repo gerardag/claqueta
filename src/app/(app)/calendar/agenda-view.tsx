@@ -38,7 +38,7 @@ export function AgendaView({ episodes }: Props) {
         return (
           <div key={date}>
             <h3
-              className={`text-sm font-medium mb-2 capitalize ${isToday ? "text-accent" : "text-muted"}`}
+              className={`text-sm font-medium mb-2 capitalize ${isToday ? "text-foreground" : "text-muted"}`}
             >
               {formatted}
               {isToday && ` — ${t("todayLabel")}`}

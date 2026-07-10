@@ -16,7 +16,9 @@
     "search": "Cerca",
     "import": "Importació",
     "library": "Biblioteca",
-    "settings": "Configuració"
+    "settings": "Configuració",
+    "menu": "Menú",
+    "closeMenu": "Tanca el menú"
   },
   "auth": {
     "loginTitle": "Inicia sessió",
@@ -154,22 +156,14 @@
     },
     "settings": {
       "title": "Configuració",
+      "account": {
+        "title": "Compte"
+      },
       "theme": {
         "title": "Tema",
-        "description": "Paletes de colors inspirades en el Dictionary of Color Combinations de Sanzo Wada.",
-        "dark": "Foscos",
-        "light": "Clars",
-        "default": "Per defecte",
-        "nit-violeta": "Nit violeta",
-        "bosc-profund": "Bosc profund",
-        "brasa": "Brasa",
-        "mar-de-nit": "Mar de nit",
-        "capvespre": "Capvespre",
-        "tarda-estiu": "Tarda d'estiu",
-        "jardi-japones": "Jardí japonès",
-        "pergami": "Pergamí",
-        "mati-tardor": "Matí de tardor",
-        "lavanda": "Lavanda"
+        "description": "Tria l'aparença de l'aplicació.",
+        "dark": "Fosc",
+        "light": "Clar"
       },
       "language": "Idioma",
       "languageDescription": "Selecciona l'idioma de l'aplicació.",

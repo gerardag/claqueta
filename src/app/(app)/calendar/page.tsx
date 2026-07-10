@@ -42,7 +42,7 @@ export default async function CalendarPage({ searchParams }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">{t("title")}</h1>
+      <h1 className="font-display font-bold text-2xl tracking-tight mb-6">{t("title")}</h1>
 
       <UpcomingSection episodes={upcoming} />
 
