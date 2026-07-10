@@ -90,6 +90,13 @@ export function Header({ userMenu }: { userMenu?: React.ReactNode }) {
             className="logo-light h-5 w-auto"
           />
         </Link>
+        <Link
+          href="/search"
+          className="ml-auto text-muted hover:text-foreground transition-colors"
+          aria-label={t("search")}
+        >
+          <SearchIcon />
+        </Link>
       </header>
 
       {open && (

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import type { ShowWithProgress } from "@/lib/db/queries";
-import { ProgressBar } from "./progress-bar";
 import { stopShowAction, deleteShowAction } from "./actions";
 import { useToast } from "@/components/toast";
 
@@ -14,7 +13,6 @@ export function ShowCard({ show }: { show: ShowWithProgress }) {
   const tToast = useTranslations("toast");
   const locale = useLocale();
   const showToast = useToast();
-  const pending = show.totalAired - show.watched;
   const posterUrl = show.posterPath
     ? `https://image.tmdb.org/t/p/w300${show.posterPath}`
     : null;
@@ -92,12 +90,6 @@ export function ShowCard({ show }: { show: ShowWithProgress }) {
             )}
           </div>
         </div>
-        <ProgressBar watched={show.watched} total={show.totalAired} />
-        {pending > 0 && (
-          <p className="text-xs text-muted mt-1">
-            {t("pending", { count: pending })}
-          </p>
-        )}
         {show.nextAirDate && (
           <p className="text-xs text-accent mt-1">
             {t("nextEpisode", { date: formatAirDate(show.nextAirDate, locale) })}

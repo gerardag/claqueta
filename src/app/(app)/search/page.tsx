@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useRef, useCallback } from "react";
+import Link from "next/link";
 import type { ShowSearchResult } from "@/lib/tmdb/dto";
 import { useToast } from "@/components/toast";
 
@@ -20,22 +21,28 @@ function SearchResultCard({
 
   return (
     <div className="group bg-surface rounded-lg overflow-hidden border border-border hover:border-accent/50 transition-colors">
-      <div className="aspect-[2/3] relative bg-surface-hover">
-        {show.posterUrl ? (
-          <img
-            src={show.posterUrl}
-            alt={show.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted text-sm">
-            🎬
-          </div>
-        )}
-      </div>
+      <Link href={`/series/${show.id}`}>
+        <div className="aspect-[2/3] relative bg-surface-hover">
+          {show.posterUrl ? (
+            <img
+              src={show.posterUrl}
+              alt={show.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted text-sm">
+              🎬
+            </div>
+          )}
+        </div>
+      </Link>
       <div className="p-2">
-        <p className="text-sm font-medium truncate">{show.name}</p>
+        <Link href={`/series/${show.id}`}>
+          <p className="text-sm font-medium truncate hover:text-accent transition-colors">
+            {show.name}
+          </p>
+        </Link>
         {show.firstAirDate && (
           <p className="text-xs text-muted">{show.firstAirDate.slice(0, 4)}</p>
         )}

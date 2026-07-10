@@ -43,7 +43,6 @@
       "title": "Les meves sèries",
       "empty": "Encara no segueixes cap sèrie.",
       "searchCta": "Cerca sèries",
-      "pending": "{count, plural, one {Tens # episodi pendent} other {Tens # episodis pendents}}",
       "nextEpisode": "Nou episodi el {date}",
       "lastWatched": "Darrer episodi vist {time}",
       "seeLibrary": "Veure biblioteca",
