@@ -11,6 +11,7 @@ import {
 import { fetchTmdb } from "@/lib/tmdb/client";
 import type { TmdbShowDetailRaw } from "@/lib/tmdb/dto";
 import { normalizeShowDetail } from "@/lib/tmdb/dto";
+import { upsertShowFromTmdb } from "@/lib/tmdb/sync";
 import { SeasonSection } from "./season-section";
 import { ShowActions } from "./show-actions";
 import { BackButton } from "./back-button";
@@ -40,6 +41,7 @@ export default async function ShowDetailPage({ params }: Props) {
     notFound();
   }
 
+  await upsertShowFromTmdb(tmdbId);
   const localShow = getShowByTmdbId(db, tmdbId);
   const userShow = localShow
     ? getUserShowByTmdbId(db, userId, tmdbId)
@@ -119,11 +121,14 @@ export default async function ShowDetailPage({ params }: Props) {
 
       {seasonData.length > 0 && (
         <div className="space-y-2">
-          {seasonData.map((season) => (
+          {seasonData.map((season, index) => (
             <SeasonSection
               key={season.seasonNumber}
               tmdbId={tmdbId}
               season={season}
+              previousSeasonNumbers={seasonData
+                .slice(0, index)
+                .map((s) => s.seasonNumber)}
             />
           ))}
         </div>

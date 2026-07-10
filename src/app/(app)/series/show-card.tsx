@@ -32,9 +32,9 @@ export function ShowCard({ show }: { show: ShowWithProgress }) {
   }, [menuOpen]);
 
   return (
-    <div className="group relative bg-surface rounded-lg overflow-hidden border border-border hover:border-accent/50 transition-colors">
+    <div className="group relative bg-surface rounded-lg border border-border hover:border-accent/50 transition-colors">
       <Link href={`/series/${show.tmdbId}`}>
-        <div className="aspect-[2/3] relative bg-surface-hover">
+        <div className="aspect-[2/3] relative bg-surface-hover rounded-t-lg overflow-hidden">
           {posterUrl ? (
             <img
               src={posterUrl}

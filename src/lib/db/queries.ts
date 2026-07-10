@@ -484,6 +484,21 @@ export function updateUserShowState(
     .run();
 }
 
+export function upsertUserShowState(
+  db: DB,
+  userId: number,
+  showId: number,
+  state: schema.UserShow["state"],
+): void {
+  db.insert(schema.userShows)
+    .values({ userId, showId, state })
+    .onConflictDoUpdate({
+      target: [schema.userShows.userId, schema.userShows.showId],
+      set: { state, lastActivityAt: new Date() },
+    })
+    .run();
+}
+
 export function getUserShowByTmdbId(
   db: DB,
   userId: number,

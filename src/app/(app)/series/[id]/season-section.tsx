@@ -26,26 +26,39 @@ interface SeasonData {
 interface Props {
   tmdbId: number;
   season: SeasonData;
+  previousSeasonNumbers: number[];
 }
 
-export function SeasonSection({ tmdbId, season }: Props) {
+export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) {
   const t = useTranslations("pages.showDetail");
   const tToast = useTranslations("toast");
   const locale = useLocale();
   const showToast = useToast();
   const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const allAiredWatched =
     season.airedCount > 0 && season.watchedCount >= season.airedCount;
 
+  async function markWatched(includePrevious: boolean) {
+    setConfirmOpen(false);
+    await markSeasonWatchedAction(
+      tmdbId,
+      includePrevious
+        ? [season.seasonNumber, ...previousSeasonNumbers]
+        : season.seasonNumber,
+    );
+    showToast(tToast("seasonWatched"));
+  }
+
   return (
     <div className="bg-surface rounded-lg border border-border overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between p-3 hover:bg-surface-hover transition-colors text-left focus-visible:outline-accent"
-      >
-        <div className="flex items-center gap-3">
+      <div className="w-full flex items-center justify-between p-3 gap-2">
+        <button
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity focus-visible:outline-accent"
+        >
           <svg
-            className={`w-4 h-4 text-muted transition-transform ${open ? "rotate-90" : ""}`}
+            className={`w-4 h-4 text-muted transition-transform flex-shrink-0 ${open ? "rotate-90" : ""}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -53,12 +66,12 @@ export function SeasonSection({ tmdbId, season }: Props) {
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          <span className="font-medium text-sm">{season.name}</span>
-          <span className="text-xs text-muted">
+          <span className="font-medium text-sm truncate">{season.name}</span>
+          <span className="text-xs text-muted flex-shrink-0">
             {t("episodes", { count: season.totalCount })}
           </span>
-        </div>
-        <div className="flex items-center gap-2">
+        </button>
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-xs text-muted">
             {season.watchedCount}/{season.airedCount}
           </span>
@@ -70,22 +83,55 @@ export function SeasonSection({ tmdbId, season }: Props) {
               }}
             />
           </div>
+          {!allAiredWatched && season.airedCount > 0 && (
+            <button
+              onClick={() => {
+                if (previousSeasonNumbers.length > 0) {
+                  setConfirmOpen(true);
+                } else {
+                  markWatched(false);
+                }
+              }}
+              aria-label={t("markSeasonWatched")}
+              title={t("markSeasonWatched")}
+              className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-muted hover:border-accent/50 hover:text-accent transition-colors focus-visible:outline-accent"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </button>
+          )}
         </div>
-      </button>
+      </div>
+
+      {confirmOpen && (
+        <div className="px-4 py-3 border-t border-border bg-surface-hover flex flex-col gap-2">
+          <p className="text-xs text-muted">{t("previousSeasonsPrompt")}</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => markWatched(false)}
+              className="text-xs bg-surface border border-border px-2.5 py-1 rounded-md hover:border-accent/50 transition-colors focus-visible:outline-accent"
+            >
+              {t("previousSeasonsOnlyThis")}
+            </button>
+            <button
+              onClick={() => markWatched(true)}
+              className="text-xs bg-accent text-white px-2.5 py-1 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
+            >
+              {t("previousSeasonsAlsoPrevious")}
+            </button>
+            <button
+              onClick={() => setConfirmOpen(false)}
+              className="text-xs text-muted px-2.5 py-1 rounded-md hover:text-foreground transition-colors focus-visible:outline-accent"
+            >
+              {t("cancel")}
+            </button>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="border-t border-border">
-          {!allAiredWatched && season.airedCount > 0 && (
-            <button
-              onClick={async () => {
-                await markSeasonWatchedAction(tmdbId, season.seasonNumber);
-                showToast(tToast("seasonWatched"));
-              }}
-              className="w-full text-left text-xs text-accent px-4 py-2 hover:bg-surface-hover transition-colors border-b border-border focus-visible:outline-accent"
-            >
-              {t("markSeasonWatched")}
-            </button>
-          )}
           <div className="divide-y divide-border" role="list">
             {season.episodes.map((ep) => (
               <div

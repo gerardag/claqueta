@@ -61,6 +61,7 @@
         "stop": "Deixa de mirar",
         "delete": "Elimina",
         "resume": "Reprèn",
+        "follow": "Segueix",
         "markWatched": "Marca com a vist"
       }
     },
@@ -119,6 +120,11 @@
       "markWatched": "Marca com a vist",
       "markUnwatched": "Desmarca",
       "markSeasonWatched": "Marca tota la temporada",
+      "markShowWatched": "Marca tota la sèrie com a vista",
+      "previousSeasonsPrompt": "Vols marcar també com a vistes les temporades anteriors?",
+      "previousSeasonsOnlyThis": "Només aquesta",
+      "previousSeasonsAlsoPrevious": "Aquesta i les anteriors",
+      "cancel": "Cancel·la",
       "overview": "Sinopsi",
       "status": "Estat",
       "statuses": {
@@ -189,9 +195,11 @@
   "toast": {
     "episodeWatched": "Episodi marcat com a vist",
     "seasonWatched": "Temporada marcada com a vista",
+    "showWatched": "Sèrie marcada com a vista",
     "showStopped": "Sèrie abandonada",
     "showDeleted": "Sèrie eliminada",
     "showResumed": "Sèrie represa",
+    "showFollowed": "Ara segueixes la sèrie",
     "showCompleted": "Sèrie completada",
     "showTracked": "Sèrie afegida",
     "localeSaved": "Idioma actualitzat"

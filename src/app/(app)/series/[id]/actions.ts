@@ -9,7 +9,7 @@ import {
   getShowByTmdbId,
   getEpisodeByShowSeasonEp,
   getEpisodesByShow,
-  updateUserShowState,
+  upsertUserShowState,
   getUserShowByTmdbId,
 } from "@/lib/db/queries";
 import { requireUser } from "@/lib/auth-helpers";
@@ -40,11 +40,12 @@ export async function toggleEpisodeAction(
     unmarkEpisodeWatched(db, userId, episode.id);
   } else {
     markEpisodeWatched(db, userId, episode.id);
-    touchActivity(db, userId, show.id);
 
     const userShow = getUserShowByTmdbId(db, userId, tmdbId);
-    if (userShow && userShow.state === "STOPPED") {
-      updateUserShowState(db, userId, show.id, "WATCHING");
+    if (!userShow || userShow.state === "STOPPED") {
+      upsertUserShowState(db, userId, show.id, "WATCHING");
+    } else {
+      touchActivity(db, userId, show.id);
     }
   }
 
@@ -54,7 +55,7 @@ export async function toggleEpisodeAction(
 
 export async function markSeasonWatchedAction(
   tmdbId: number,
-  seasonNumber: number,
+  seasonNumbers: number | number[],
 ) {
   const user = await requireUser();
   const userId = Number(user.id);
@@ -63,10 +64,11 @@ export async function markSeasonWatchedAction(
   const show = getShowByTmdbId(db, tmdbId);
   if (!show) return;
 
+  const numbers = Array.isArray(seasonNumbers) ? seasonNumbers : [seasonNumbers];
   const today = new Date().toISOString().slice(0, 10);
   const seasonEpisodes = getEpisodesByShow(db, show.id).filter(
     (ep) =>
-      ep.seasonNumber === seasonNumber &&
+      numbers.includes(ep.seasonNumber) &&
       ep.airDate &&
       ep.airDate <= today,
   );
@@ -75,12 +77,36 @@ export async function markSeasonWatchedAction(
     markEpisodeWatched(db, userId, ep.id);
   }
 
-  touchActivity(db, userId, show.id);
-
   const userShow = getUserShowByTmdbId(db, userId, tmdbId);
-  if (userShow && userShow.state === "STOPPED") {
-    updateUserShowState(db, userId, show.id, "WATCHING");
+  if (!userShow || userShow.state === "STOPPED") {
+    upsertUserShowState(db, userId, show.id, "WATCHING");
+  } else {
+    touchActivity(db, userId, show.id);
   }
+
+  revalidatePath(`/series/${tmdbId}`);
+  revalidatePath("/series");
+}
+
+export async function markShowWatchedAction(tmdbId: number) {
+  const user = await requireUser();
+  const userId = Number(user.id);
+
+  await upsertShowFromTmdb(tmdbId);
+  const show = getShowByTmdbId(db, tmdbId);
+  if (!show) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const airedEpisodes = getEpisodesByShow(db, show.id).filter(
+    (ep) => ep.airDate && ep.airDate <= today,
+  );
+
+  for (const ep of airedEpisodes) {
+    markEpisodeWatched(db, userId, ep.id);
+  }
+
+  touchActivity(db, userId, show.id);
+  upsertUserShowState(db, userId, show.id, "COMPLETED");
 
   revalidatePath(`/series/${tmdbId}`);
   revalidatePath("/series");
@@ -93,10 +119,11 @@ export async function changeShowStateAction(
   const user = await requireUser();
   const userId = Number(user.id);
 
+  await upsertShowFromTmdb(tmdbId);
   const show = getShowByTmdbId(db, tmdbId);
   if (!show) return;
 
-  updateUserShowState(db, userId, show.id, state);
+  upsertUserShowState(db, userId, show.id, state);
 
   revalidatePath(`/series/${tmdbId}`);
   revalidatePath("/series");
