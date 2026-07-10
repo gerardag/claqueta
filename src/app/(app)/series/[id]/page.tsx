@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { requireUser } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import {
@@ -14,6 +13,7 @@ import type { TmdbShowDetailRaw } from "@/lib/tmdb/dto";
 import { normalizeShowDetail } from "@/lib/tmdb/dto";
 import { SeasonSection } from "./season-section";
 import { ShowActions } from "./show-actions";
+import { BackButton } from "./back-button";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -84,12 +84,7 @@ export default async function ShowDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <Link
-        href="/series"
-        className="inline-flex items-center gap-1 text-sm text-muted hover:text-foreground mb-4 transition-colors"
-      >
-        ← {t("back")}
-      </Link>
+      <BackButton />
 
       <div className="flex flex-col sm:flex-row gap-6 mb-8">
         {detail.posterUrl && (

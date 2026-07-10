@@ -1,8 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { ShowSearchResult } from "@/lib/tmdb/dto";
 import { useToast } from "@/components/toast";
 
@@ -62,11 +63,13 @@ function SearchResultCard({
   );
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const t = useTranslations("pages.search");
   const tToast = useTranslations("toast");
   const showToast = useToast();
-  const [query, setQuery] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [results, setResults] = useState<ShowSearchResult[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -104,8 +107,18 @@ export default function SearchPage() {
     }
   }, []);
 
+  useEffect(() => {
+    const q = searchParams.get("q") ?? "";
+    if (q) queueMicrotask(() => search(q));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleChange(value: string) {
     setQuery(value);
+    router.replace(
+      value.trim() ? `/search?q=${encodeURIComponent(value)}` : "/search",
+      { scroll: false },
+    );
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => search(value), 400);
   }
@@ -178,5 +191,13 @@ export default function SearchPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={null}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
