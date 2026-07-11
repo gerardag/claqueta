@@ -78,8 +78,8 @@
   --status-watching-fg: var(--foreground);
   --status-following-bg: color-mix(in srgb, #3b82f6 15%, transparent);
   --status-following-fg: #3b82f6;
-  --status-completed-bg: color-mix(in srgb, #22c55e 15%, transparent);
-  --status-completed-fg: #22c55e;
+  --status-completed-bg: color-mix(in srgb, #22c55e 60%, var(--paper));
+  --status-completed-fg: var(--ink);
   --status-stopped-bg: color-mix(in srgb, var(--muted) 15%, transparent);
   --status-stopped-fg: var(--muted);
 }

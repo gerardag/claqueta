@@ -134,7 +134,7 @@ function LibraryCard({ show }: { show: LibraryShow }) {
         <div className="mt-1">
           <div className="h-1.5 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-accent rounded-full transition-all"
+              className="h-full bg-foreground rounded-full transition-all"
               style={{ width: `${pct}%` }}
             />
           </div>

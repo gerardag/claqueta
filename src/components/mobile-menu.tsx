@@ -52,7 +52,7 @@ export function MobileMenu({ userMenu }: { userMenu?: React.ReactNode }) {
                 <span className="absolute left-1/2 top-1/2 h-[2.5px] w-7 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-full bg-paper" />
               </button>
             </div>
-            <nav className="flex flex-1 flex-col gap-1 px-4 py-2">
+            <nav className="flex flex-1 flex-col px-4 py-2">
               {MENU_ITEMS.map((item) => {
                 const active =
                   pathname === item.href || pathname.startsWith(item.href + "/");
@@ -61,9 +61,9 @@ export function MobileMenu({ userMenu }: { userMenu?: React.ReactNode }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-3 text-base transition-colors ${
+                    className={`flex items-center gap-3 px-3 py-2 text-base uppercase tracking-wide transition-colors ${
                       active
-                        ? "bg-accent text-accent-fg"
+                        ? "font-semibold text-paper underline underline-offset-4"
                         : "text-paper/70 hover:bg-paper/10 hover:text-paper"
                     }`}
                     style={{ borderRadius: "var(--radius-menu-row)" }}
@@ -75,14 +75,14 @@ export function MobileMenu({ userMenu }: { userMenu?: React.ReactNode }) {
               })}
             </nav>
             <div
-              className="flex flex-col gap-1 border-t border-paper/15 px-4 py-3"
+              className="flex flex-col border-t border-paper/15 px-4 py-3"
               style={{ paddingBottom: "calc(var(--safe-bottom) + 0.75rem)" }}
             >
               <Link
                 href="/settings"
-                className={`flex items-center gap-3 px-3 py-3 text-base transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 text-base uppercase tracking-wide transition-colors ${
                   pathname === "/settings" || pathname.startsWith("/settings/")
-                    ? "bg-accent text-accent-fg"
+                    ? "font-semibold text-paper underline underline-offset-4"
                     : "text-paper/70 hover:bg-paper/10 hover:text-paper"
                 }`}
                 style={{ borderRadius: "var(--radius-menu-row)" }}
