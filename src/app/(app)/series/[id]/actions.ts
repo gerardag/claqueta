@@ -98,7 +98,7 @@ export async function markShowWatchedAction(tmdbId: number) {
 
   const today = new Date().toISOString().slice(0, 10);
   const airedEpisodes = getEpisodesByShow(db, show.id).filter(
-    (ep) => ep.airDate && ep.airDate <= today,
+    (ep) => ep.seasonNumber > 0 && ep.airDate && ep.airDate <= today,
   );
 
   for (const ep of airedEpisodes) {

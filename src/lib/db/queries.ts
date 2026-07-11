@@ -54,15 +54,18 @@ export function getUserShowsGrouped(db: DB, userId: number) {
         inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
         where ${schema.watchedEpisodes.userId} = ${userId}
           and ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
       ), 0)`,
       totalAired: sql<number>`coalesce((
         select count(*) from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
       ), 0)`,
       nextEpSeason: sql<number | null>`(
         select ${schema.episodes.seasonNumber} from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
           and ${schema.episodes.id} not in (
             select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
@@ -74,6 +77,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       nextEpNumber: sql<number | null>`(
         select ${schema.episodes.episodeNumber} from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
           and ${schema.episodes.id} not in (
             select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
@@ -85,6 +89,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       nextEpName: sql<string | null>`(
         select ${schema.episodes.name} from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
           and ${schema.episodes.id} not in (
             select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
@@ -96,6 +101,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       nextEpAirDate: sql<string | null>`(
         select ${schema.episodes.airDate} from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
           and ${schema.episodes.id} not in (
             select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
@@ -107,6 +113,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       latestUnwatchedAirDate: sql<string | null>`(
         select ${schema.episodes.airDate} from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
           and ${schema.episodes.id} not in (
             select ${schema.watchedEpisodes.episodeId} from ${schema.watchedEpisodes}
@@ -157,18 +164,11 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       latestUnwatchedAirDate: row.latestUnwatchedAirDate,
     };
 
-    const pendingEpisodesAreOld =
-      row.nextEpAirDate != null &&
-      new Date(row.nextEpAirDate + "T00:00:00") < staleThreshold;
-
     switch (row.state) {
       case "WATCHING":
         if (row.watched === 0) {
           watchlist.push(item);
-        } else if (
-          row.lastActivityAt <= staleThreshold ||
-          pendingEpisodesAreOld
-        ) {
+        } else if (row.lastActivityAt <= staleThreshold) {
           stale.push(item);
         } else if (pending === 0) {
           following.push(item);
@@ -177,10 +177,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
         }
         break;
       case "FOLLOWING":
-        if (
-          row.lastActivityAt <= staleThreshold ||
-          pendingEpisodesAreOld
-        ) {
+        if (row.lastActivityAt <= staleThreshold) {
           stale.push(item);
         } else {
           following.push(item);
@@ -245,10 +242,12 @@ export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
         inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
         where ${schema.watchedEpisodes.userId} = ${userId}
           and ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
       ), 0)`,
       totalAired: sql<number>`coalesce((
         select count(*) from ${schema.episodes}
         where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
       ), 0)`,
     })
@@ -297,10 +296,12 @@ export function getShowProgress(
         inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
         where ${schema.watchedEpisodes.userId} = ${userId}
           and ${schema.episodes.showId} = ${showId}
+          and ${schema.episodes.seasonNumber} > 0
       ), 0)`,
       total: sql<number>`coalesce((
         select count(*) from ${schema.episodes}
         where ${schema.episodes.showId} = ${showId}
+          and ${schema.episodes.seasonNumber} > 0
           and ${schema.episodes.airDate} <= ${today}
       ), 0)`,
     })
@@ -361,7 +362,7 @@ export function getUpcoming(
         eq(schema.userShows.userId, userId),
       ),
     )
-    .where(gt(schema.episodes.airDate, today))
+    .where(and(gt(schema.episodes.seasonNumber, 0), gt(schema.episodes.airDate, today)))
     .orderBy(asc(schema.episodes.airDate))
     .all();
 }
@@ -412,6 +413,7 @@ export function getCalendar(
     .where(
       and(
         inArray(schema.userShows.state, ["WATCHING", "FOLLOWING"]),
+        gt(schema.episodes.seasonNumber, 0),
         gte(schema.episodes.airDate, from),
         lte(schema.episodes.airDate, to),
       ),

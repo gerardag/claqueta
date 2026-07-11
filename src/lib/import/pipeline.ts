@@ -107,8 +107,11 @@ export async function runImportPipeline(
           .run();
 
         episodeCount++;
-        if (!latestWatched || watchedAt > latestWatched) {
-          latestWatched = watchedAt;
+        if (
+          ep.watchedAt &&
+          (!latestWatched || ep.watchedAt > latestWatched)
+        ) {
+          latestWatched = ep.watchedAt;
         }
       }
 
@@ -146,7 +149,6 @@ export async function runImportPipeline(
             .run();
           episodeCount++;
         }
-        if (toMark.length > 0) latestWatched = fallbackDate;
       }
 
       if (latestWatched) {

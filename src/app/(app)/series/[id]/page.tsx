@@ -12,6 +12,7 @@ import { fetchTmdb } from "@/lib/tmdb/client";
 import type { TmdbShowDetailRaw } from "@/lib/tmdb/dto";
 import { normalizeShowDetail } from "@/lib/tmdb/dto";
 import { upsertShowFromTmdb } from "@/lib/tmdb/sync";
+import { fetchScare } from "@/lib/scare/client";
 import { SeasonSection } from "./season-section";
 import { ShowActions } from "./show-actions";
 import { BackButton } from "./back-button";
@@ -40,6 +41,8 @@ export default async function ShowDetailPage({ params }: Props) {
   } catch {
     notFound();
   }
+
+  const scareResult = await fetchScare(tmdbId, "tv");
 
   await upsertShowFromTmdb(tmdbId);
   const localShow = getShowByTmdbId(db, tmdbId);
@@ -109,6 +112,19 @@ export default async function ShowDetailPage({ params }: Props) {
           />
         )}
         <div className="flex-1">
+          {scareResult && (
+            <span
+              className={`inline-block text-sm px-3 py-1 rounded-full mb-2 ${
+                scareResult.scared === "si"
+                  ? "bg-red-500/15 text-red-500"
+                  : scareResult.scared === "mig"
+                    ? "bg-amber-500/15 text-amber-500"
+                    : "bg-green-500/15 text-green-500"
+              }`}
+            >
+              {scareResult.label}
+            </span>
+          )}
           <h1 className="font-display font-bold text-2xl tracking-tight mb-2">{detail.name}</h1>
           {detail.originalName !== detail.name && (
             <p className="text-sm text-muted mb-2">{detail.originalName}</p>

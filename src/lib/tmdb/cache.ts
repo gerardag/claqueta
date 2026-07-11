@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { tmdbCache } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
-export type TtlCategory = "search" | "show" | "season" | "airing" | "find";
+export type TtlCategory = "search" | "show" | "season" | "airing" | "find" | "scare";
 
 const TTL_MS: Record<TtlCategory, number> = {
   search: 24 * 60 * 60 * 1000,
@@ -10,6 +10,7 @@ const TTL_MS: Record<TtlCategory, number> = {
   season: 7 * 24 * 60 * 60 * 1000,
   airing: 6 * 60 * 60 * 1000,
   find: 30 * 24 * 60 * 60 * 1000,
+  scare: 24 * 60 * 60 * 1000,
 };
 
 export function ttlMs(category: TtlCategory): number {
