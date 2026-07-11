@@ -77,6 +77,10 @@ export default async function ShowDetailPage({ params }: Props) {
     };
   });
 
+  const totalAired = seasonData.reduce((sum, s) => sum + s.airedCount, 0);
+  const totalWatched = seasonData.reduce((sum, s) => sum + s.watchedCount, 0);
+  const allEpisodesWatched = totalAired > 0 && totalWatched >= totalAired;
+
   const statusMap: Record<string, string> = {
     "Returning Series": t("statuses.Returning Series"),
     Ended: t("statuses.Ended"),
@@ -123,7 +127,11 @@ export default async function ShowDetailPage({ params }: Props) {
               {detail.overview}
             </p>
           )}
-          <ShowActions tmdbId={tmdbId} userShow={userShow ?? null} />
+          <ShowActions
+            tmdbId={tmdbId}
+            userShow={userShow ?? null}
+            allEpisodesWatched={allEpisodesWatched}
+          />
         </div>
       </div>
 

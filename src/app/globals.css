@@ -5,6 +5,7 @@
 /* ------------------------------------------------------------------ */
 :root {
   --ink: #0f0e12;
+  --paper: #ffffff;
   --background: var(--ink);
   --foreground: #ededed;
   --surface: #1c1c1c;
@@ -33,6 +34,7 @@
 
 @theme inline {
   --color-ink: var(--ink);
+  --color-paper: var(--paper);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);

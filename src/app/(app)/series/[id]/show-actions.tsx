@@ -8,14 +8,16 @@ import { useToast } from "@/components/toast";
 interface Props {
   tmdbId: number;
   userShow: (UserShow & { showId: number }) | null;
+  allEpisodesWatched: boolean;
 }
 
-export function ShowActions({ tmdbId, userShow }: Props) {
+export function ShowActions({ tmdbId, userShow, allEpisodesWatched }: Props) {
   const t = useTranslations("pages.series");
   const tToast = useTranslations("toast");
   const showToast = useToast();
 
   const state = userShow?.state ?? null;
+  const completed = state === "COMPLETED" || allEpisodesWatched;
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -36,7 +38,7 @@ export function ShowActions({ tmdbId, userShow }: Props) {
             await changeShowStateAction(tmdbId, "FOLLOWING");
             showToast(tToast("showFollowed"));
           }}
-          className="text-sm bg-surface-hover text-muted px-3 py-1.5 rounded-md hover:text-foreground transition-colors focus-visible:outline-accent"
+          className="text-sm bg-surface-hover text-foreground px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-accent"
         >
           {t("actions.follow")}
         </button>
@@ -47,21 +49,25 @@ export function ShowActions({ tmdbId, userShow }: Props) {
             await changeShowStateAction(tmdbId, "STOPPED");
             showToast(tToast("showStopped"));
           }}
-          className="text-sm bg-surface-hover text-muted px-3 py-1.5 rounded-md hover:text-foreground transition-colors focus-visible:outline-accent"
+          className="text-sm bg-surface-hover text-foreground px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-accent"
         >
           {t("actions.stop")}
         </button>
       )}
-      {state !== "COMPLETED" && (
+      {!completed ? (
         <button
           onClick={async () => {
             await markShowWatchedAction(tmdbId);
             showToast(tToast("showWatched"));
           }}
-          className="text-sm bg-surface-hover text-muted px-3 py-1.5 rounded-md hover:text-foreground transition-colors focus-visible:outline-accent"
+          className="text-sm bg-surface-hover text-foreground px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-accent"
         >
           ✓ {t("sections.completed")}
         </button>
+      ) : (
+        <span className="text-sm bg-accent text-accent-fg px-3 py-1.5 rounded-md">
+          ✓ {t("sections.completed")}
+        </span>
       )}
     </div>
   );

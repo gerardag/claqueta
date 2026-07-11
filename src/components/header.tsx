@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { DesktopNav } from "./desktop-nav";
 import { MobileMenu } from "./mobile-menu";
-import { SearchIcon } from "./icons";
+import { SearchToggle } from "./search-toggle";
 
 export async function Header({
   userMenu,
@@ -28,13 +28,7 @@ export async function Header({
           className="logo-light h-5 w-auto"
         />
       </Link>
-      <Link
-        href="/search"
-        className="flex md:hidden items-center text-ink"
-        aria-label={tNav("search")}
-      >
-        <SearchIcon className="h-7 w-7" strokeWidth={2.5} />
-      </Link>
+      <SearchToggle label={tNav("search")} />
       <DesktopNav />
       {userMenu && <div className="hidden md:flex ml-auto items-center">{userMenu}</div>}
       <div className="ml-auto flex items-center gap-4 md:hidden">

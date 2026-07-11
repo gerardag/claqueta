@@ -15,11 +15,11 @@ export function UserMenu({
   if (variant === "stacked") {
     return (
       <div className="flex items-center justify-between px-3 py-3">
-        <span className="text-base text-muted truncate">{name}</span>
+        <span className="text-base text-paper/70 truncate">{name}</span>
         <form action={signOutAction}>
           <button
             type="submit"
-            className="text-sm text-muted hover:text-foreground transition-colors"
+            className="text-sm text-paper/70 hover:text-paper transition-colors"
           >
             {t("signOut")}
           </button>

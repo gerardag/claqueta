@@ -54,7 +54,7 @@ function SearchResultCard({
         <button
           onClick={() => onTrack(show.id)}
           disabled={trackingState === "loading" || trackingState === "tracked"}
-          className="mt-2 w-full text-xs font-medium px-2 py-1.5 rounded bg-accent text-accent-fg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          className="mt-2 w-full text-xs font-medium px-2 py-1.5 rounded bg-surface-hover text-foreground hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity focus-visible:outline-accent"
         >
           {trackingState === "tracked"
             ? `✓ ${t("tracked")}`

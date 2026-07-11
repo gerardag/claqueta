@@ -73,28 +73,34 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
         </button>
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-xs text-muted">
-            {season.watchedCount}/{season.airedCount}
+            {season.watchedCount}/{season.totalCount}
           </span>
           <div className="w-16 h-1.5 bg-border rounded-full overflow-hidden">
             <div
-              className="h-full bg-accent rounded-full transition-all"
+              className="h-full bg-foreground rounded-full transition-all"
               style={{
-                width: `${season.airedCount > 0 ? (season.watchedCount / season.airedCount) * 100 : 0}%`,
+                width: `${season.totalCount > 0 ? (season.watchedCount / season.totalCount) * 100 : 0}%`,
               }}
             />
           </div>
-          {!allAiredWatched && season.airedCount > 0 && (
+          {season.airedCount > 0 && (
             <button
               onClick={() => {
+                if (allAiredWatched) return;
                 if (previousSeasonNumbers.length > 0) {
                   setConfirmOpen(true);
                 } else {
                   markWatched(false);
                 }
               }}
+              disabled={allAiredWatched}
               aria-label={t("markSeasonWatched")}
               title={t("markSeasonWatched")}
-              className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-muted hover:border-foreground/50 hover:text-foreground transition-colors focus-visible:outline-accent"
+              className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors focus-visible:outline-accent ${
+                allAiredWatched
+                  ? "bg-accent border-accent text-accent-fg cursor-default"
+                  : "border-border text-muted hover:border-foreground/50 hover:text-foreground"
+              }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
