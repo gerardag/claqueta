@@ -67,6 +67,17 @@
         "markWatched": "Marca com a vist"
       }
     },
+    "regularitza": {
+      "title": "Regularitza sèries",
+      "description": "Aquestes sèries estan marcades com a completades, però han estrenat episodis nous que encara no has vist. Tria si vols tornar-les a seguir o deixar-les com a completades.",
+      "empty": "No hi ha cap sèrie completada amb episodis nous pendents.",
+      "bannerText": "{count, plural, one {Tens una sèrie completada amb episodis nous. Vols regularitzar-la?} other {Tens # sèries completades amb episodis nous. Vols regularitzar-les?}}",
+      "pendingCount": "{count, plural, one {# episodi nou pendent} other {# episodis nous pendents}}",
+      "actions": {
+        "follow": "Posa en seguiment",
+        "keepCompleted": "Mantén-la completada"
+      }
+    },
     "calendar": {
       "title": "Calendari",
       "upcoming": "Properament",

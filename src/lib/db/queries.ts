@@ -258,6 +258,52 @@ export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
     .all();
 }
 
+export interface CompletedShowWithPending {
+  tmdbId: number;
+  name: string;
+  posterPath: string | null;
+  watched: number;
+  totalAired: number;
+}
+
+export function getCompletedShowsWithPending(
+  db: DB,
+  userId: number,
+): CompletedShowWithPending[] {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return db
+    .select({
+      tmdbId: schema.shows.tmdbId,
+      name: schema.shows.name,
+      posterPath: schema.shows.posterPath,
+      watched: sql<number>`coalesce((
+        select count(*) from ${schema.watchedEpisodes}
+        inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
+        where ${schema.watchedEpisodes.userId} = ${userId}
+          and ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
+      ), 0)`,
+      totalAired: sql<number>`coalesce((
+        select count(*) from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
+          and ${schema.episodes.airDate} <= ${today}
+      ), 0)`,
+    })
+    .from(schema.userShows)
+    .innerJoin(schema.shows, eq(schema.userShows.showId, schema.shows.id))
+    .where(
+      and(
+        eq(schema.userShows.userId, userId),
+        eq(schema.userShows.state, "COMPLETED"),
+      ),
+    )
+    .orderBy(asc(schema.shows.name))
+    .all()
+    .filter((show) => show.totalAired - show.watched > 0);
+}
+
 export function getUserShows(
   db: DB,
   userId: number,

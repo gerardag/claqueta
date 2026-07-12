@@ -1,17 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import { requireUser } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
-import { getUserShowsGrouped } from "@/lib/db/queries";
+import { getUserShowsGrouped, getCompletedShowsWithPending } from "@/lib/db/queries";
 import { ShowCard } from "./show-card";
 import { WatchingCard } from "./watching-card";
-import { ClapperboardIcon, LibraryIcon } from "@/components/icons";
+import { ClapperboardIcon, LibraryIcon, RefreshIcon } from "@/components/icons";
 import Link from "next/link";
 
 export default async function SeriesPage() {
   const t = await getTranslations("pages.series");
+  const tRegularitza = await getTranslations("pages.regularitza");
   const user = await requireUser();
   const { watching, watchlist, stale, following, completed, stopped } =
     getUserShowsGrouped(db, Number(user.id));
+  const toRegularize = getCompletedShowsWithPending(db, Number(user.id));
 
   const isEmpty =
     watching.length === 0 &&
@@ -41,6 +43,19 @@ export default async function SeriesPage() {
   return (
     <div>
       <h1 className="font-display font-bold text-3xl tracking-tight mb-6">{t("title")}</h1>
+
+      {toRegularize.length > 0 && (
+        <Link
+          href="/regularitza"
+          className="flex items-center gap-3 bg-surface border border-border p-3 mb-8 hover:border-foreground/50 transition-colors"
+          style={{ borderRadius: "var(--radius-md)" }}
+        >
+          <RefreshIcon className="size-5 text-muted shrink-0" />
+          <span className="text-sm">
+            {tRegularitza("bannerText", { count: toRegularize.length })}
+          </span>
+        </Link>
+      )}
 
       {watching.length > 0 && (
         <section className="mb-8">
