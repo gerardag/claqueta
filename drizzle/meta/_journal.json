@@ -36,6 +36,13 @@
       "when": 1783841994056,
       "tag": "0004_fix_import_last_activity_no_real_date",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1783843344802,
+      "tag": "0005_fix_bulk_fallback_last_activity",
+      "breakpoints": true
     }
   ]
 }

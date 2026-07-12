@@ -141,7 +141,10 @@ export async function runImportPipeline(
 
         const remaining = expectedCount - episodeCount;
         const toMark = airedEps.slice(0, remaining);
-        const fallbackDate = new Date();
+        // Use the best real date we have for this show, not "now" — these
+        // episodes have no genuine watched date, and stamping them with the
+        // current time made the show look freshly watched forever.
+        const fallbackDate = latestWatched ?? new Date(0);
         for (const ep of toMark) {
           db.insert(watchedEpisodes)
             .values({ userId, episodeId: ep.id, watchedAt: fallbackDate })
@@ -154,6 +157,16 @@ export async function runImportPipeline(
       if (latestWatched) {
         db.update(userShows)
           .set({ lastActivityAt: latestWatched })
+          .where(
+            and(eq(userShows.userId, userId), eq(userShows.showId, showId)),
+          )
+          .run();
+      } else if (!existingUserShow) {
+        // No real per-episode date exists anywhere for this show — don't
+        // leave last_activity_at at its insert-time default (effectively
+        // "now"), which would make an untouched show look freshly watched.
+        db.update(userShows)
+          .set({ lastActivityAt: new Date(0) })
           .where(
             and(eq(userShows.userId, userId), eq(userShows.showId, showId)),
           )
