@@ -29,6 +29,13 @@
       "when": 1783551000000,
       "tag": "0003_fix_import_last_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1783841994056,
+      "tag": "0004_fix_import_last_activity_no_real_date",
+      "breakpoints": true
     }
   ]
 }
