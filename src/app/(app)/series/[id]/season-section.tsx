@@ -161,7 +161,7 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
                     }
                   }}
                   disabled={!ep.aired}
-                  className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
+                  className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background ${
                     ep.watched
                       ? "bg-accent border-accent text-accent-fg"
                       : "border-border hover:border-foreground/50"

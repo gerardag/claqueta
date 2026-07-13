@@ -37,6 +37,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
   );
 
   const today = now.toISOString().slice(0, 10);
+  const staleThresholdStr = staleThreshold.toISOString().slice(0, 10);
 
   const rows = db
     .select({
@@ -122,6 +123,13 @@ export function getUserShowsGrouped(db: DB, userId: number) {
         order by ${schema.episodes.seasonNumber} desc, ${schema.episodes.episodeNumber} desc
         limit 1
       )`,
+      recentAiredCount: sql<number>`coalesce((
+        select count(*) from ${schema.episodes}
+        where ${schema.episodes.showId} = ${schema.shows.id}
+          and ${schema.episodes.seasonNumber} > 0
+          and ${schema.episodes.airDate} > ${staleThresholdStr}
+          and ${schema.episodes.airDate} <= ${today}
+      ), 0)`,
     })
     .from(schema.userShows)
     .innerJoin(schema.shows, eq(schema.userShows.showId, schema.shows.id))
@@ -164,20 +172,29 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       latestUnwatchedAirDate: row.latestUnwatchedAirDate,
     };
 
+    const caughtUp = pending === 0 && row.totalAired > 0;
+    const backlogWithinRecentAirings =
+      row.recentAiredCount > 0 && pending <= row.recentAiredCount;
+    const isStale =
+      row.lastActivityAt <= staleThreshold && !backlogWithinRecentAirings;
+
     switch (row.state) {
       case "WATCHING":
         if (row.watched === 0) {
           watchlist.push(item);
-        } else if (row.lastActivityAt <= staleThreshold) {
+        } else if (caughtUp) {
+          // Fully caught up: nothing to do until a new episode airs, so
+          // don't clutter watching/following/stale with it.
+        } else if (isStale) {
           stale.push(item);
-        } else if (pending === 0) {
-          following.push(item);
         } else {
           watching.push(item);
         }
         break;
       case "FOLLOWING":
-        if (row.lastActivityAt <= staleThreshold) {
+        if (caughtUp) {
+          // Same as above — reappears once a new episode is pending.
+        } else if (isStale) {
           stale.push(item);
         } else {
           following.push(item);
@@ -223,6 +240,7 @@ export interface LibraryShow {
   name: string;
   posterPath: string | null;
   state: schema.UserShow["state"];
+  status: string | null;
   watched: number;
   totalAired: number;
 }
@@ -237,6 +255,7 @@ export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
       name: schema.shows.name,
       posterPath: schema.shows.posterPath,
       state: schema.userShows.state,
+      status: schema.shows.status,
       watched: sql<number>`coalesce((
         select count(*) from ${schema.watchedEpisodes}
         inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}

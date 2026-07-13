@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { UserShow } from "@/lib/db/schema";
 import { changeShowStateAction, markShowWatchedAction } from "./actions";
 import { useToast } from "@/components/toast";
+import { EyeIcon } from "@/components/icons";
 
 interface Props {
   tmdbId: number;
@@ -18,42 +19,37 @@ export function ShowActions({ tmdbId, userShow, allEpisodesWatched }: Props) {
 
   const state = userShow?.state ?? null;
   const completed = state === "COMPLETED" || allEpisodesWatched;
+  const isFollowing = state === "WATCHING" || state === "FOLLOWING";
+
+  async function toggleFollow() {
+    if (isFollowing) {
+      await changeShowStateAction(tmdbId, "STOPPED");
+      showToast(tToast("showStopped"));
+    } else if (state === "STOPPED") {
+      await changeShowStateAction(tmdbId, "WATCHING");
+      showToast(tToast("showResumed"));
+    } else {
+      await changeShowStateAction(tmdbId, "FOLLOWING");
+      showToast(tToast("showFollowed"));
+    }
+  }
 
   return (
     <div className="flex flex-wrap gap-2">
-      {state === "STOPPED" && (
-        <button
-          onClick={async () => {
-            await changeShowStateAction(tmdbId, "WATCHING");
-            showToast(tToast("showResumed"));
-          }}
-          className="text-sm bg-accent text-accent-fg px-3 py-1.5 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
-        >
-          {t("actions.resume")}
-        </button>
-      )}
-      {state !== "WATCHING" && state !== "FOLLOWING" && (
-        <button
-          onClick={async () => {
-            await changeShowStateAction(tmdbId, "FOLLOWING");
-            showToast(tToast("showFollowed"));
-          }}
-          className="text-sm bg-surface-hover text-foreground px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-accent"
-        >
-          {t("actions.follow")}
-        </button>
-      )}
-      {(state === "WATCHING" || state === "FOLLOWING") && (
-        <button
-          onClick={async () => {
-            await changeShowStateAction(tmdbId, "STOPPED");
-            showToast(tToast("showStopped"));
-          }}
-          className="text-sm bg-surface-hover text-foreground px-3 py-1.5 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-accent"
-        >
-          {t("actions.stop")}
-        </button>
-      )}
+      <button
+        onClick={toggleFollow}
+        aria-pressed={isFollowing}
+        className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md transition-opacity hover:opacity-80 focus-visible:outline-accent ${
+          isFollowing ? "bg-accent text-accent-fg" : "bg-surface-hover text-foreground"
+        }`}
+      >
+        <EyeIcon className="size-4 shrink-0" crossed={isFollowing} />
+        {isFollowing
+          ? t("actions.stop")
+          : state === "STOPPED"
+            ? t("actions.resume")
+            : t("actions.follow")}
+      </button>
       {!completed ? (
         <button
           onClick={async () => {
@@ -65,7 +61,13 @@ export function ShowActions({ tmdbId, userShow, allEpisodesWatched }: Props) {
           ✓ {t("sections.completed")}
         </button>
       ) : (
-        <span className="text-sm bg-accent text-accent-fg px-3 py-1.5 rounded-md">
+        <span
+          className="text-sm px-3 py-1.5 rounded-md"
+          style={{
+            background: "var(--status-completed-bg)",
+            color: "var(--status-completed-fg)",
+          }}
+        >
           ✓ {t("sections.completed")}
         </span>
       )}

@@ -43,6 +43,13 @@
       "when": 1783843344802,
       "tag": "0005_fix_bulk_fallback_last_activity",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1783888283657,
+      "tag": "0006_refix_bulk_fallback_last_activity",
+      "breakpoints": true
     }
   ]
 }

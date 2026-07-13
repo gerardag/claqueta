@@ -158,6 +158,7 @@
       "searchCta": "Cerca sèries",
       "noResults": "Cap sèrie coincideix amb «{query}».",
       "total": "{count, plural, one {# sèrie} other {# sèries}}",
+      "ended": "Finalitzada",
       "states": {
         "WATCHING": "Mirant",
         "FOLLOWING": "Seguint",

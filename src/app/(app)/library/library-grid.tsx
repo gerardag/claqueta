@@ -108,6 +108,7 @@ function LibraryCard({ show }: { show: LibraryShow }) {
     show.totalAired > 0
       ? Math.round((show.watched / show.totalAired) * 100)
       : 0;
+  const hasEnded = show.status === "Ended" || show.status === "Canceled";
 
   return (
     <Link
@@ -116,6 +117,17 @@ function LibraryCard({ show }: { show: LibraryShow }) {
       style={{ borderRadius: "var(--radius-md)" }}
     >
       <div className="aspect-[2/3] relative bg-surface-hover overflow-hidden">
+        {hasEnded && (
+          <span
+            className="absolute top-1.5 left-1.5 z-10 text-[10px] font-medium px-1.5 py-0.5 rounded"
+            style={{
+              background: "var(--status-completed-bg)",
+              color: "var(--status-completed-fg)",
+            }}
+          >
+            {t("ended")}
+          </span>
+        )}
         {posterUrl ? (
           <img
             src={posterUrl}
@@ -131,17 +143,19 @@ function LibraryCard({ show }: { show: LibraryShow }) {
       </div>
       <div className="p-2">
         <p className="font-display font-semibold text-sm truncate">{show.name}</p>
-        <div className="mt-1">
-          <div className="h-1.5 bg-border rounded-full overflow-hidden">
-            <div
-              className="h-full bg-foreground rounded-full transition-all"
-              style={{ width: `${pct}%` }}
-            />
+        {show.state !== "COMPLETED" && (
+          <div className="mt-1">
+            <div className="h-1.5 bg-border rounded-full overflow-hidden">
+              <div
+                className="h-full bg-foreground rounded-full transition-all"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted mt-0.5">
+              {show.watched}/{show.totalAired}
+            </p>
           </div>
-          <p className="text-xs text-muted mt-0.5">
-            {show.watched}/{show.totalAired}
-          </p>
-        </div>
+        )}
         <span
           className="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded mt-1"
           style={STATE_COLORS[show.state]}
