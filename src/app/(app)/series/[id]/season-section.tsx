@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
-import { toggleEpisodeAction, markSeasonWatchedAction } from "./actions";
+import {
+  toggleEpisodeAction,
+  markSeasonWatchedAction,
+  markEpisodeAndPreviousAction,
+} from "./actions";
 import { useToast } from "@/components/toast";
 
 interface EpisodeData {
@@ -36,6 +41,9 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
   const showToast = useToast();
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [episodeConfirm, setEpisodeConfirm] = useState<EpisodeData | null>(
+    null,
+  );
   const allAiredWatched =
     season.airedCount > 0 && season.watchedCount >= season.airedCount;
 
@@ -48,6 +56,25 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
         : season.seasonNumber,
     );
     showToast(tToast("seasonWatched"));
+  }
+
+  async function toggleEpisode(ep: EpisodeData, includePrevious: boolean) {
+    setEpisodeConfirm(null);
+    if (includePrevious) {
+      await markEpisodeAndPreviousAction(
+        tmdbId,
+        season.seasonNumber,
+        ep.episodeNumber,
+      );
+    } else {
+      await toggleEpisodeAction(
+        tmdbId,
+        season.seasonNumber,
+        ep.episodeNumber,
+        ep.watched,
+      );
+    }
+    showToast(tToast("episodeWatched"));
   }
 
   return (
@@ -136,6 +163,44 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
         </div>
       )}
 
+      {episodeConfirm &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setEpisodeConfirm(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-lg border border-foreground/15 bg-surface-hover p-4 flex flex-col gap-3 shadow-2xl"
+            >
+              <p className="text-sm">{t("previousEpisodesPrompt")}</p>
+              <div className="flex flex-wrap justify-end gap-2">
+                <button
+                  onClick={() => setEpisodeConfirm(null)}
+                  className="text-xs text-muted px-2.5 py-1.5 rounded-md hover:text-foreground transition-colors focus-visible:outline-accent"
+                >
+                  {t("cancel")}
+                </button>
+                <button
+                  onClick={() => toggleEpisode(episodeConfirm, false)}
+                  className="text-xs bg-surface border border-border px-2.5 py-1.5 rounded-md hover:border-foreground/50 transition-colors focus-visible:outline-accent"
+                >
+                  {t("previousEpisodesOnlyThis")}
+                </button>
+                <button
+                  onClick={() => toggleEpisode(episodeConfirm, true)}
+                  className="text-xs bg-accent text-accent-fg px-2.5 py-1.5 rounded-md hover:opacity-90 transition-opacity focus-visible:outline-accent"
+                >
+                  {t("previousEpisodesAlsoPrevious")}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
       {open && (
         <div className="border-t border-border">
           <div className="divide-y divide-border" role="list">
@@ -150,15 +215,20 @@ export function SeasonSection({ tmdbId, season, previousSeasonNumbers }: Props) 
                   aria-checked={ep.watched}
                   aria-label={`${ep.name || t("episodeFallback", { number: ep.episodeNumber })} — ${ep.watched ? t("markUnwatched") : t("markWatched")}`}
                   onClick={async () => {
-                    if (ep.aired) {
-                      await toggleEpisodeAction(
-                        tmdbId,
-                        season.seasonNumber,
-                        ep.episodeNumber,
-                        ep.watched,
+                    if (!ep.aired) return;
+                    if (!ep.watched) {
+                      const hasPreviousUnwatched = season.episodes.some(
+                        (e) =>
+                          e.aired &&
+                          !e.watched &&
+                          e.episodeNumber < ep.episodeNumber,
                       );
-                      showToast(tToast("episodeWatched"));
+                      if (hasPreviousUnwatched) {
+                        setEpisodeConfirm(ep);
+                        return;
+                      }
                     }
+                    await toggleEpisode(ep, false);
                   }}
                   disabled={!ep.aired}
                   className={`w-5 h-5 rounded-full border flex-shrink-0 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1 focus-visible:ring-offset-background ${

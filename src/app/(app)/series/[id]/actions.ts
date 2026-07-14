@@ -11,9 +11,28 @@ import {
   getEpisodesByShow,
   upsertUserShowState,
   getUserShowByTmdbId,
+  getShowProgress,
+  isShowFullyWatchedAndEnded,
 } from "@/lib/db/queries";
 import { requireUser } from "@/lib/auth-helpers";
 import { upsertShowFromTmdb } from "@/lib/tmdb/sync";
+
+function applyWatchStateAfterProgress(
+  userId: number,
+  showId: number,
+  showStatus: string | null,
+  currentState: string | undefined,
+) {
+  const { watched, total } = getShowProgress(db, userId, showId);
+
+  if (isShowFullyWatchedAndEnded(showStatus, watched, total)) {
+    upsertUserShowState(db, userId, showId, "COMPLETED");
+  } else if (!currentState || currentState === "STOPPED") {
+    upsertUserShowState(db, userId, showId, "WATCHING");
+  } else {
+    touchActivity(db, userId, showId);
+  }
+}
 
 export async function toggleEpisodeAction(
   tmdbId: number,
@@ -42,12 +61,45 @@ export async function toggleEpisodeAction(
     markEpisodeWatched(db, userId, episode.id);
 
     const userShow = getUserShowByTmdbId(db, userId, tmdbId);
-    if (!userShow || userShow.state === "STOPPED") {
-      upsertUserShowState(db, userId, show.id, "WATCHING");
-    } else {
-      touchActivity(db, userId, show.id);
-    }
+    applyWatchStateAfterProgress(
+      userId,
+      show.id,
+      show.status,
+      userShow?.state,
+    );
   }
+
+  revalidatePath(`/series/${tmdbId}`);
+  revalidatePath("/series");
+}
+
+export async function markEpisodeAndPreviousAction(
+  tmdbId: number,
+  seasonNumber: number,
+  episodeNumber: number,
+) {
+  const user = await requireUser();
+  const userId = Number(user.id);
+
+  await upsertShowFromTmdb(tmdbId);
+  const show = getShowByTmdbId(db, tmdbId);
+  if (!show) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const episodesToMark = getEpisodesByShow(db, show.id).filter(
+    (ep) =>
+      ep.seasonNumber === seasonNumber &&
+      ep.episodeNumber <= episodeNumber &&
+      ep.airDate &&
+      ep.airDate <= today,
+  );
+
+  for (const ep of episodesToMark) {
+    markEpisodeWatched(db, userId, ep.id);
+  }
+
+  const userShow = getUserShowByTmdbId(db, userId, tmdbId);
+  applyWatchStateAfterProgress(userId, show.id, show.status, userShow?.state);
 
   revalidatePath(`/series/${tmdbId}`);
   revalidatePath("/series");
@@ -78,11 +130,7 @@ export async function markSeasonWatchedAction(
   }
 
   const userShow = getUserShowByTmdbId(db, userId, tmdbId);
-  if (!userShow || userShow.state === "STOPPED") {
-    upsertUserShowState(db, userId, show.id, "WATCHING");
-  } else {
-    touchActivity(db, userId, show.id);
-  }
+  applyWatchStateAfterProgress(userId, show.id, show.status, userShow?.state);
 
   revalidatePath(`/series/${tmdbId}`);
   revalidatePath("/series");

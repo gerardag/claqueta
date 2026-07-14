@@ -82,6 +82,7 @@ function SearchPageContent() {
   const [trackingStates, setTrackingStates] = useState<
     Record<number, TrackingState>
   >({});
+  const [trackedIds, setTrackedIds] = useState<Set<number>>(new Set());
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const search = useCallback(async (q: string) => {
@@ -115,6 +116,15 @@ function SearchPageContent() {
     const q = searchParams.get("q") ?? "";
     if (q) queueMicrotask(() => search(q));
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/shows/tracked-ids")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.tmdbIds) setTrackedIds(new Set<number>(data.tmdbIds));
+      })
+      .catch(() => {});
   }, []);
 
   function handleChange(value: string) {
@@ -188,7 +198,10 @@ function SearchPageContent() {
                 key={show.id}
                 show={show}
                 onTrack={handleTrack}
-                trackingState={trackingStates[show.id] ?? "idle"}
+                trackingState={
+                  trackingStates[show.id] ??
+                  (trackedIds.has(show.id) ? "tracked" : "idle")
+                }
               />
             ))}
           </div>

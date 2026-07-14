@@ -2,16 +2,20 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { useState } from "react";
 import type { ShowWithProgress } from "@/lib/db/queries";
 import { markNextEpisodeAction } from "./actions";
 import { useToast } from "@/components/toast";
 import { TvIcon } from "@/components/icons";
+
+const CONFIRM_DELAY_MS = 220;
 
 export function WatchingCard({ show }: { show: ShowWithProgress }) {
   const t = useTranslations("pages.series");
   const tToast = useTranslations("toast");
   const locale = useLocale();
   const showToast = useToast();
+  const [confirming, setConfirming] = useState(false);
   const posterUrl = show.posterPath
     ? `https://image.tmdb.org/t/p/w185${show.posterPath}`
     : null;
@@ -21,7 +25,11 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
 
   return (
     <div
-      className="group flex items-stretch bg-surface border border-border hover:border-foreground/50 transition-colors overflow-hidden"
+      className={`group flex items-stretch border transition-colors duration-200 overflow-hidden ${
+        confirming
+          ? "bg-accent/10 border-accent"
+          : "bg-surface border-border hover:border-foreground/50"
+      }`}
       style={{ borderRadius: "var(--radius-md)" }}
     >
       <Link
@@ -87,16 +95,20 @@ export function WatchingCard({ show }: { show: ShowWithProgress }) {
 
         {ep && (
           <button
+            disabled={confirming}
             onClick={async () => {
+              setConfirming(true);
+              await new Promise((resolve) => setTimeout(resolve, CONFIRM_DELAY_MS));
               await markNextEpisodeAction(
                 show.showId,
                 show.tmdbId,
                 ep.seasonNumber,
                 ep.episodeNumber,
               );
+              setConfirming(false);
               showToast(tToast("episodeWatched"));
             }}
-            className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-border hover:border-foreground hover:text-foreground text-muted transition-colors flex items-center justify-center focus-visible:outline-accent"
+            className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-border hover:border-foreground hover:text-foreground text-muted transition-colors flex items-center justify-center focus-visible:outline-accent disabled:opacity-60"
             aria-label={t("actions.markWatched")}
           >
             <svg

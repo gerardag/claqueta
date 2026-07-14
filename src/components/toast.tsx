@@ -36,7 +36,7 @@ export function Toaster({ children }: { children?: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="rounded-lg px-4 py-2.5 text-sm shadow-lg animate-in fade-in slide-in-from-bottom-2 pointer-events-auto"
+            className="px-4 py-2.5 text-sm shadow-lg animate-in fade-in slide-in-from-bottom-2 pointer-events-auto"
             style={{ background: "var(--ink)", color: "var(--paper)" }}
           >
             {toast.message}

@@ -6,6 +6,18 @@ type DB = BetterSQLite3Database<typeof schema>;
 
 const STALE_DAYS = Number(process.env.STALE_DAYS ?? "45");
 
+const ENDED_STATUSES = new Set(["Ended", "Canceled"]);
+
+export function isShowFullyWatchedAndEnded(
+  status: string | null,
+  watched: number,
+  totalAired: number,
+): boolean {
+  return (
+    totalAired > 0 && watched >= totalAired && !!status && ENDED_STATUSES.has(status)
+  );
+}
+
 export interface NextEpisodeInfo {
   seasonNumber: number;
   episodeNumber: number;
@@ -30,6 +42,16 @@ export interface ShowWithProgress {
   latestUnwatchedAirDate: string | null;
 }
 
+export function getTrackedTmdbIds(db: DB, userId: number): number[] {
+  return db
+    .select({ tmdbId: schema.shows.tmdbId })
+    .from(schema.userShows)
+    .innerJoin(schema.shows, eq(schema.shows.id, schema.userShows.showId))
+    .where(eq(schema.userShows.userId, userId))
+    .all()
+    .map((row) => row.tmdbId);
+}
+
 export function getUserShowsGrouped(db: DB, userId: number) {
   const now = new Date();
   const staleThreshold = new Date(
@@ -47,6 +69,7 @@ export function getUserShowsGrouped(db: DB, userId: number) {
       name: schema.shows.name,
       posterPath: schema.shows.posterPath,
       state: schema.userShows.state,
+      status: schema.shows.status,
       lastActivityAt: schema.userShows.lastActivityAt,
       nextAirDate: schema.shows.nextAirDate,
       totalEpisodes: sql<number>`coalesce(${schema.shows.numberOfEpisodes}, 0)`,
@@ -144,6 +167,14 @@ export function getUserShowsGrouped(db: DB, userId: number) {
   const stopped: ShowWithProgress[] = [];
 
   for (const row of rows) {
+    if (
+      (row.state === "WATCHING" || row.state === "FOLLOWING") &&
+      isShowFullyWatchedAndEnded(row.status, row.watched, row.totalAired)
+    ) {
+      upsertUserShowState(db, userId, row.showId, "COMPLETED");
+      row.state = "COMPLETED";
+    }
+
     const pending = row.totalAired - row.watched;
     const nextEpisode: NextEpisodeInfo | null =
       row.nextEpSeason != null && row.nextEpNumber != null
@@ -248,9 +279,10 @@ export interface LibraryShow {
 export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
   const today = new Date().toISOString().slice(0, 10);
 
-  return db
+  const rows = db
     .select({
       userShowId: schema.userShows.id,
+      showId: schema.shows.id,
       tmdbId: schema.shows.tmdbId,
       name: schema.shows.name,
       posterPath: schema.shows.posterPath,
@@ -275,6 +307,18 @@ export function getLibraryShows(db: DB, userId: number): LibraryShow[] {
     .where(eq(schema.userShows.userId, userId))
     .orderBy(asc(schema.shows.name))
     .all();
+
+  for (const row of rows) {
+    if (
+      (row.state === "WATCHING" || row.state === "FOLLOWING") &&
+      isShowFullyWatchedAndEnded(row.status, row.watched, row.totalAired)
+    ) {
+      upsertUserShowState(db, userId, row.showId, "COMPLETED");
+      row.state = "COMPLETED";
+    }
+  }
+
+  return rows;
 }
 
 export interface CompletedShowWithPending {
@@ -354,26 +398,35 @@ export function getShowProgress(
 ): { watched: number; total: number } {
   const today = new Date().toISOString().slice(0, 10);
 
-  const [result] = db
-    .select({
-      watched: sql<number>`coalesce((
-        select count(*) from ${schema.watchedEpisodes}
-        inner join ${schema.episodes} on ${schema.episodes.id} = ${schema.watchedEpisodes.episodeId}
-        where ${schema.watchedEpisodes.userId} = ${userId}
-          and ${schema.episodes.showId} = ${showId}
-          and ${schema.episodes.seasonNumber} > 0
-      ), 0)`,
-      total: sql<number>`coalesce((
-        select count(*) from ${schema.episodes}
-        where ${schema.episodes.showId} = ${showId}
-          and ${schema.episodes.seasonNumber} > 0
-          and ${schema.episodes.airDate} <= ${today}
-      ), 0)`,
-    })
-    .from(sql`(select 1)`)
+  const [{ watched }] = db
+    .select({ watched: sql<number>`count(*)` })
+    .from(schema.watchedEpisodes)
+    .innerJoin(
+      schema.episodes,
+      eq(schema.episodes.id, schema.watchedEpisodes.episodeId),
+    )
+    .where(
+      and(
+        eq(schema.watchedEpisodes.userId, userId),
+        eq(schema.episodes.showId, showId),
+        gt(schema.episodes.seasonNumber, 0),
+      ),
+    )
     .all();
 
-  return { watched: result.watched, total: result.total };
+  const [{ total }] = db
+    .select({ total: sql<number>`count(*)` })
+    .from(schema.episodes)
+    .where(
+      and(
+        eq(schema.episodes.showId, showId),
+        gt(schema.episodes.seasonNumber, 0),
+        lte(schema.episodes.airDate, today),
+      ),
+    )
+    .all();
+
+  return { watched, total };
 }
 
 export function touchActivity(db: DB, userId: number, showId: number): void {
