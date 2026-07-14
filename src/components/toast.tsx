@@ -31,12 +31,13 @@ export function Toaster({ children }: { children?: React.ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
+        className="fixed bottom-4 left-4 right-4 sm:right-auto z-50 flex flex-col gap-2 pointer-events-none"
       >
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="bg-surface border border-border rounded-lg px-4 py-2.5 text-sm shadow-lg animate-in fade-in slide-in-from-bottom-2 pointer-events-auto"
+            className="rounded-lg px-4 py-2.5 text-sm shadow-lg animate-in fade-in slide-in-from-bottom-2 pointer-events-auto"
+            style={{ background: "var(--ink)", color: "var(--paper)" }}
           >
             {toast.message}
           </div>

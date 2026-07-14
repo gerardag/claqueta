@@ -47,7 +47,7 @@ export function LibraryGrid({ shows }: { shows: LibraryShow[] }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("placeholder")}
-            className="w-full pl-10 pr-4 py-2 bg-surface border border-border rounded-lg text-sm focus:outline-none focus:border-foreground transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-surface border border-border rounded-lg text-sm placeholder:text-muted focus:outline-none focus:border-foreground transition-colors"
           />
         </div>
       </div>
@@ -121,8 +121,8 @@ function LibraryCard({ show }: { show: LibraryShow }) {
           <span
             className="absolute top-1.5 left-1.5 z-10 text-[10px] font-medium px-1.5 py-0.5 rounded"
             style={{
-              background: "var(--status-completed-bg)",
-              color: "var(--status-completed-fg)",
+              background: "var(--status-ended-bg)",
+              color: "var(--status-ended-fg)",
             }}
           >
             {t("ended")}

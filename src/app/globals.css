@@ -26,7 +26,7 @@
   --surface: #ececec;
   --surface-hover: #e2e2e2;
   --border: #d8d8d8;
-  --muted: #6b6b6b;
+  --muted: #525252;
   --accent: #f6e3e6;
   --accent-fg: var(--ink);
   --menu: #ffffff;
@@ -82,6 +82,8 @@
   --status-completed-fg: var(--ink);
   --status-stopped-bg: color-mix(in srgb, var(--muted) 15%, transparent);
   --status-stopped-fg: var(--muted);
+  --status-ended-bg: #0600ff;
+  --status-ended-fg: var(--paper);
 }
 
 body {
