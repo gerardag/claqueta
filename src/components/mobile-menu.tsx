@@ -5,7 +5,10 @@ import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { MenuDotsIcon, TvIcon, CalendarIcon, LibraryIcon, SettingsIcon } from "./icons";
+import { MenuDotsIcon, TvIcon, CalendarIcon, LibraryIcon } from "./icons";
+import { UserAvatar } from "./user-avatar";
+import { ThemeSelector } from "./theme-selector";
+import { signOutAction } from "./sign-out-action";
 
 const MENU_ITEMS = [
   { href: "/series", key: "series", icon: TvIcon },
@@ -13,9 +16,10 @@ const MENU_ITEMS = [
   { href: "/library", key: "library", icon: LibraryIcon },
 ] as const;
 
-export function MobileMenu({ userMenu }: { userMenu?: React.ReactNode }) {
+export function MobileMenu({ avatarUrl }: { avatarUrl: string | null }) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("nav");
+  const tAuth = useTranslations("auth");
   const pathname = usePathname();
 
   useEffect(() => {
@@ -75,22 +79,37 @@ export function MobileMenu({ userMenu }: { userMenu?: React.ReactNode }) {
               })}
             </nav>
             <div
-              className="flex flex-col border-t border-paper/15 px-4 py-3"
+              className="flex flex-col gap-8 border-t border-paper/15 px-4 py-3"
               style={{ paddingBottom: "calc(var(--safe-bottom) + 0.75rem)" }}
             >
-              <Link
-                href="/settings"
-                className={`flex items-center gap-3 px-3 py-2 text-base uppercase tracking-wide transition-colors ${
-                  pathname === "/settings" || pathname.startsWith("/settings/")
-                    ? "font-semibold text-paper underline underline-offset-4"
-                    : "text-paper/70 hover:bg-paper/10 hover:text-paper"
-                }`}
-                style={{ borderRadius: "var(--radius-menu-row)" }}
-              >
-                <SettingsIcon />
-                <span>{t("settings")}</span>
+              <ThemeSelector variant="menu" />
+              <div className="flex flex-col gap-3">
+                <Link
+                  href="/settings"
+                  className={`text-sm font-medium transition-colors ${
+                    pathname === "/settings" || pathname.startsWith("/settings/")
+                      ? "text-paper"
+                      : "text-paper/70 hover:text-paper"
+                  }`}
+                >
+                  {t("settings")}
+                </Link>
+                <form action={signOutAction}>
+                  <button
+                    type="submit"
+                    className="text-sm text-paper/70 hover:text-paper transition-colors"
+                  >
+                    {tAuth("signOut")}
+                  </button>
+                </form>
+              </div>
+              <Link href="/settings" className="block" aria-label={t("settings")}>
+                <UserAvatar
+                  avatarUrl={avatarUrl}
+                  className="size-9"
+                  iconClassName="size-5"
+                />
               </Link>
-              {userMenu}
             </div>
           </div>,
           document.body,

@@ -3,10 +3,11 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { UserIcon } from "./icons";
+import { UserAvatar } from "./user-avatar";
+import { ThemeSelector } from "./theme-selector";
 import { signOutAction } from "./sign-out-action";
 
-export function DesktopUserCorner() {
+export function DesktopUserCorner({ avatarUrl }: { avatarUrl: string | null }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
   const tAuth = useTranslations("auth");
@@ -14,30 +15,34 @@ export function DesktopUserCorner() {
 
   return (
     <div
-      className="hidden md:flex fixed z-30 flex-col gap-2"
+      className="hidden md:block fixed z-30 group"
       style={{ left: 32, bottom: 32 }}
     >
-      <div className="flex items-center gap-3">
-        <span className="flex items-center justify-center size-9 rounded-full bg-surface text-muted">
-          <UserIcon className="size-5" />
-        </span>
-        <Link
-          href="/settings"
-          className={`text-sm font-medium transition-colors ${
-            active ? "text-foreground" : "text-muted hover:text-foreground"
-          }`}
-        >
-          {t("settings")}
-        </Link>
+      <button type="button" className="block rounded-full" aria-label={t("settings")}>
+        <UserAvatar avatarUrl={avatarUrl} className="size-9" iconClassName="size-5" />
+      </button>
+
+      <div className="absolute bottom-full left-0 flex w-max flex-col gap-8 pb-4 opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:pointer-events-auto">
+        <ThemeSelector />
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/settings"
+            className={`text-sm font-medium transition-colors ${
+              active ? "text-foreground" : "text-muted hover:text-foreground"
+            }`}
+          >
+            {t("settings")}
+          </Link>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="text-sm text-muted hover:text-foreground transition-colors"
+            >
+              {tAuth("signOut")}
+            </button>
+          </form>
+        </div>
       </div>
-      <form action={signOutAction}>
-        <button
-          type="submit"
-          className="text-sm text-muted hover:text-foreground transition-colors"
-        >
-          {tAuth("signOut")}
-        </button>
-      </form>
     </div>
   );
 }

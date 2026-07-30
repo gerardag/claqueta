@@ -5,9 +5,9 @@ import { MobileMenu } from "./mobile-menu";
 import { SearchToggle } from "./search-toggle";
 
 export async function Header({
-  mobileUserMenu,
+  avatarUrl,
 }: {
-  mobileUserMenu?: React.ReactNode;
+  avatarUrl?: string | null;
 }) {
   const t = await getTranslations("app");
   const tNav = await getTranslations("nav");
@@ -18,10 +18,10 @@ export async function Header({
         <SearchToggle label={tNav("search")} />
         <DesktopNav title={t("title")} />
         <div className="ml-auto flex items-center gap-4 md:hidden">
-          <MobileMenu userMenu={mobileUserMenu} />
+          <MobileMenu avatarUrl={avatarUrl ?? null} />
         </div>
       </header>
-      <DesktopUserCorner />
+      <DesktopUserCorner avatarUrl={avatarUrl ?? null} />
     </>
   );
 }

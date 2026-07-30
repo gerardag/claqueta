@@ -2,26 +2,36 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+import { SunIcon, MoonIcon, AutoThemeIcon } from "./icons";
 
-type ThemeId = "dark" | "light";
+type ThemeId = "dark" | "light" | "auto";
+
+const THEMES = ["dark", "light", "auto"] as const;
 
 function getStoredTheme(): ThemeId {
   if (typeof window === "undefined") return "dark";
-  return (localStorage.getItem("theme") as ThemeId) ?? "dark";
+  const stored = localStorage.getItem("theme");
+  return stored === "light" || stored === "auto" ? stored : "dark";
 }
 
 function applyTheme(id: ThemeId) {
   const html = document.documentElement;
-  if (id === "light") {
-    html.setAttribute("data-theme", "light");
-  } else {
+  if (id === "dark") {
     html.removeAttribute("data-theme");
+  } else {
+    html.setAttribute("data-theme", id);
   }
   localStorage.setItem("theme", id);
   document.cookie = `theme=${id};path=/;max-age=31536000;SameSite=Lax`;
 }
 
-export function ThemeSelector() {
+const ICONS = { dark: MoonIcon, light: SunIcon, auto: AutoThemeIcon };
+
+export function ThemeSelector({
+  variant = "surface",
+}: {
+  variant?: "surface" | "menu";
+}) {
   const t = useTranslations("pages.settings.theme");
   const [current, setCurrent] = useState<ThemeId>("dark");
 
@@ -36,22 +46,34 @@ export function ThemeSelector() {
     applyTheme(id);
   }
 
+  const isMenu = variant === "menu";
+
   return (
-    <div className="inline-flex rounded-full border border-border bg-surface p-1">
-      {(["dark", "light"] as const).map((id) => (
-        <button
-          key={id}
-          type="button"
-          onClick={() => select(id)}
-          className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
-            current === id
-              ? "bg-accent text-accent-fg"
-              : "text-muted hover:text-foreground"
-          }`}
-        >
-          {t(id)}
-        </button>
-      ))}
+    <div className="inline-flex gap-1">
+      {THEMES.map((id) => {
+        const Icon = ICONS[id];
+        const active = current === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => select(id)}
+            aria-label={t(id)}
+            aria-pressed={active}
+            className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
+              active
+                ? isMenu
+                  ? "bg-paper/15 text-paper"
+                  : "bg-accent text-accent-fg"
+                : isMenu
+                  ? "text-paper/70 hover:text-paper"
+                  : "text-muted hover:text-foreground"
+            }`}
+          >
+            <Icon className="size-4" />
+          </button>
+        );
+      })}
     </div>
   );
 }

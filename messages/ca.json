@@ -172,13 +172,26 @@
     "settings": {
       "title": "Configuració",
       "account": {
-        "title": "Compte"
+        "title": "Compte",
+        "displayName": "Nom a mostrar",
+        "email": "Correu electrònic",
+        "newPassword": "Contrasenya nova",
+        "newPasswordPlaceholder": "Deixa-ho en blanc per no canviar-la",
+        "currentPassword": "Contrasenya actual",
+        "currentPasswordHint": "Cal per confirmar els canvis.",
+        "save": "Desa els canvis",
+        "saving": "S'està desant…",
+        "saved": "Canvis desats",
+        "changeAvatar": "Canvia la imatge",
+        "removeAvatar": "Elimina",
+        "avatarHint": "Imatge de perfil, màxim 400×400 px.",
+        "avatarSaved": "Imatge de perfil actualitzada",
+        "avatarError": "No s'ha pogut actualitzar la imatge"
       },
       "theme": {
-        "title": "Tema",
-        "description": "Tria l'aparença de l'aplicació.",
         "dark": "Fosc",
-        "light": "Clar"
+        "light": "Clar",
+        "auto": "Automàtic"
       },
       "language": "Idioma",
       "languageDescription": "Selecciona l'idioma de l'aplicació.",

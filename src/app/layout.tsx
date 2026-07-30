@@ -59,7 +59,7 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=document.cookie.match(/(?:^|;)\\s*theme=([^;]+)/);if(t&&t[1]==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}})()`,
+            __html: `(function(){try{var t=document.cookie.match(/(?:^|;)\\s*theme=([^;]+)/);if(t&&(t[1]==='light'||t[1]==='auto'))document.documentElement.setAttribute('data-theme',t[1])}catch(e){}})()`,
           }}
         />
       </head>

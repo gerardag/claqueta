@@ -1,7 +1,7 @@
 import { Header } from "@/components/header";
-import { UserMenu } from "@/components/user-menu";
 import { Footer } from "@/components/footer";
 import { auth } from "@/lib/auth";
+import { getAvatarUrl } from "@/lib/auth-helpers";
 
 export default async function AppLayout({
   children,
@@ -9,11 +9,13 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const name = session?.user?.name ?? "";
+  const avatarUrl = session?.user?.id
+    ? await getAvatarUrl(Number(session.user.id))
+    : null;
 
   return (
     <div className="flex flex-col min-h-full">
-      <Header mobileUserMenu={<UserMenu name={name} variant="stacked" />} />
+      <Header avatarUrl={avatarUrl} />
       <main className="mx-auto w-full max-w-[1024px] flex-1 px-4 py-4">
         {children}
       </main>

@@ -32,6 +32,23 @@
   --menu: #ffffff;
 }
 
+/* ------------------------------------------------------------------ */
+/* Auto theme — follow system/browser preference                      */
+/* ------------------------------------------------------------------ */
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] {
+    --background: #ffffff;
+    --foreground: var(--ink);
+    --surface: #ececec;
+    --surface-hover: #e2e2e2;
+    --border: #d8d8d8;
+    --muted: #525252;
+    --accent: #f6e3e6;
+    --accent-fg: var(--ink);
+    --menu: #ffffff;
+  }
+}
+
 @theme inline {
   --color-ink: var(--ink);
   --color-paper: var(--paper);
@@ -107,6 +124,14 @@ body {
 }
 [data-theme="light"] .logo-light {
   display: block;
+}
+@media (prefers-color-scheme: light) {
+  [data-theme="auto"] .logo-dark {
+    display: none;
+  }
+  [data-theme="auto"] .logo-light {
+    display: block;
+  }
 }
 
 :focus-visible {

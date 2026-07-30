@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, uniqueIndex, index } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, blob, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
@@ -10,6 +10,9 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   displayName: text("display_name"),
   locale: text("locale").notNull().default("ca"),
+  avatarData: blob("avatar_data", { mode: "buffer" }),
+  avatarMime: text("avatar_mime"),
+  avatarUpdatedAt: integer("avatar_updated_at", { mode: "timestamp_ms" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
