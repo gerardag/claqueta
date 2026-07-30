@@ -117,6 +117,15 @@ export function RefreshIcon({ className }: IconProps) {
   );
 }
 
+export function UserIcon({ className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className ?? cls}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-3.9 3.6-7 8-7s8 3.1 8 7" />
+    </svg>
+  );
+}
+
 export function SettingsIcon({ className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className ?? cls}>

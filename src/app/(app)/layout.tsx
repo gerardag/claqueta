@@ -13,10 +13,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex flex-col min-h-full">
-      <Header
-        userMenu={<UserMenu name={name} />}
-        mobileUserMenu={<UserMenu name={name} variant="stacked" />}
-      />
+      <Header mobileUserMenu={<UserMenu name={name} variant="stacked" />} />
       <main className="mx-auto w-full max-w-[1024px] flex-1 px-4 py-4">
         {children}
       </main>
