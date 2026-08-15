@@ -22,7 +22,7 @@ export async function refreshUpcoming(userId: number): Promise<void> {
     .where(
       and(
         eq(userShows.userId, userId),
-        inArray(userShows.state, ["WATCHING", "FOLLOWING"]),
+        inArray(userShows.state, ["WATCHING", "FOLLOWING", "COMPLETED"]),
         lt(shows.lastSyncedAt, threshold),
       ),
     )

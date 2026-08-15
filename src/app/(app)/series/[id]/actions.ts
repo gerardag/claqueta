@@ -27,10 +27,10 @@ function applyWatchStateAfterProgress(
 
   if (isShowFullyWatchedAndEnded(showStatus, watched, total)) {
     upsertUserShowState(db, userId, showId, "COMPLETED");
-  } else if (!currentState || currentState === "STOPPED") {
-    upsertUserShowState(db, userId, showId, "WATCHING");
-  } else {
+  } else if (currentState === "WATCHING") {
     touchActivity(db, userId, showId);
+  } else {
+    upsertUserShowState(db, userId, showId, "WATCHING");
   }
 }
 

@@ -4,10 +4,15 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import {
   updateUserShowState,
+  upsertUserShowState,
   deleteUserShow,
   getEpisodeByShowSeasonEp,
   markEpisodeWatched,
   touchActivity,
+  getShowByTmdbId,
+  getUserShowByTmdbId,
+  getShowProgress,
+  isShowFullyWatchedAndEnded,
 } from "@/lib/db/queries";
 import { requireUser } from "@/lib/auth-helpers";
 
@@ -36,6 +41,18 @@ export async function markNextEpisodeAction(
   if (!episode) return;
 
   markEpisodeWatched(db, userId, episode.id);
-  touchActivity(db, userId, showId);
+
+  const show = getShowByTmdbId(db, tmdbId);
+  const userShow = getUserShowByTmdbId(db, userId, tmdbId);
+  const { watched, total } = getShowProgress(db, userId, showId);
+
+  if (isShowFullyWatchedAndEnded(show?.status ?? null, watched, total)) {
+    upsertUserShowState(db, userId, showId, "COMPLETED");
+  } else if (userShow?.state === "WATCHING") {
+    touchActivity(db, userId, showId);
+  } else {
+    upsertUserShowState(db, userId, showId, "WATCHING");
+  }
+
   revalidatePath("/series");
 }
